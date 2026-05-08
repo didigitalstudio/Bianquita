@@ -113,6 +113,10 @@ export default function CheckoutPage() {
         return;
       }
       clearCart();
+      if (data.paymentRedirectUrl) {
+        window.location.href = data.paymentRedirectUrl as string;
+        return;
+      }
       setOrderNumber(data.orderNumber);
       setDone(true);
       showToast("¡Pedido confirmado!");

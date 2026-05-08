@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { sendOrderStatusEmail } from "@/lib/email";
 import type { Database } from "@/lib/supabase/database.types";
 import type { Product } from "@/lib/types";
 
@@ -106,11 +107,16 @@ export async function updateStock(id: string, stock: Record<string, number>) {
 
 export async function updateOrderStatus(id: string, status: OrderStatus) {
   const supabase = await requireAdmin();
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("orders")
     .update({ status })
-    .eq("id", id);
+    .eq("id", id)
+    .select("*")
+    .single();
   if (error) throw new Error(error.message);
+  if (updated) {
+    void sendOrderStatusEmail(updated).catch((err) => console.error("[email]", err));
+  }
   revalidatePath("/admin");
 }
 

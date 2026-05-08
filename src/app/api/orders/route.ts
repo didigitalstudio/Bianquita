@@ -1,34 +1,31 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import { createOrder } from "@/lib/data/orders";
 import { createClient } from "@/lib/supabase/server";
+import { createPaymentPreference, isMercadoPagoConfigured } from "@/lib/mercadopago";
+import { sendOrderConfirmationEmail } from "@/lib/email";
+import { FREE_SHIP_THRESHOLD, TRANSFER_DISCOUNT } from "@/lib/constants";
 import type { CartItem } from "@/lib/types";
 
 interface OrderPayload {
-  customer: {
-    name: string;
-    email: string;
-    phone?: string;
-    dni?: string;
-  };
-  shipping: {
-    method: string;
-    address?: string;
-    city?: string;
-    zip?: string;
-  };
-  payment: {
-    method: "card" | "transfer" | "mp";
-  };
+  customer: { name: string; email: string; phone?: string; dni?: string };
+  shipping: { method: string; address?: string; city?: string; zip?: string };
+  payment: { method: "card" | "transfer" | "mp" };
   items: CartItem[];
   shippingCost: number;
   subtotal: number;
   total: number;
 }
 
-const FREE_SHIP_THRESHOLD = 35000;
-
 function isShippingMethod(s: unknown): s is string {
   return typeof s === "string" && s.length > 0 && s.length < 64;
+}
+
+async function resolveBaseUrl(): Promise<string> {
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const host = h.get("host") ?? "localhost:3000";
+  return `${proto}://${host}`;
 }
 
 export async function POST(request: Request) {
@@ -48,18 +45,16 @@ export async function POST(request: Request) {
   if (!isShippingMethod(body.shipping?.method)) {
     return NextResponse.json({ error: "Método de envío inválido" }, { status: 400 });
   }
-  if (!["card", "transfer", "mp"].includes(body.payment?.method)) {
+  const paymentMethod = body.payment?.method;
+  if (!["card", "transfer", "mp"].includes(paymentMethod)) {
     return NextResponse.json({ error: "Método de pago inválido" }, { status: 400 });
   }
 
-  // Recompute totals server-side from item prices to prevent tampering.
-  // (We trust the cart prices only as a placeholder; with real catalog
-  // pricing we'd look up each item by id from the products table.)
   const subtotal = body.items.reduce((s, i) => s + i.price * i.qty, 0);
   const shippingCost = subtotal >= FREE_SHIP_THRESHOLD ? 0 : Math.max(0, body.shippingCost ?? 0);
-  const total = subtotal + shippingCost;
+  const transferDiscount = paymentMethod === "transfer" ? Math.round(subtotal * TRANSFER_DISCOUNT) : 0;
+  const total = subtotal + shippingCost - transferDiscount;
 
-  // Attach user_id if logged in
   const supabase = await createClient();
   const {
     data: { user },
@@ -82,13 +77,29 @@ export async function POST(request: Request) {
       shippingCost,
       subtotal,
       total,
-      paymentMethod: body.payment.method,
+      paymentMethod,
     });
+
+    let paymentRedirectUrl: string | null = null;
+    if ((paymentMethod === "card" || paymentMethod === "mp") && isMercadoPagoConfigured()) {
+      try {
+        const baseUrl = await resolveBaseUrl();
+        const pref = await createPaymentPreference({ order, items: body.items, baseUrl });
+        paymentRedirectUrl = pref.initPoint;
+      } catch (err) {
+        console.error("[mp create-preference]", err);
+      }
+    }
+
+    // Fire-and-forget confirmation email
+    void sendOrderConfirmationEmail(order).catch((err) => console.error("[email]", err));
+
     return NextResponse.json({
       orderNumber: order.order_number,
       id: order.id,
       total: order.total,
       status: order.status,
+      paymentRedirectUrl,
     });
   } catch (err) {
     console.error("[POST /api/orders]", err);
