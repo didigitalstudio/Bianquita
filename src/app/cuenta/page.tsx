@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Mi cuenta",
+  robots: { index: false, follow: false },
+};
 import { getMyProfile, parseAddresses } from "@/lib/data/profile";
 import { listOrdersForUser } from "@/lib/data/orders";
 import { getMyWishlist } from "@/lib/data/wishlist";
