@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState, cloneElement, isValidElement } from "react";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import ProductImage from "@/components/ui/ProductImage";
@@ -305,10 +305,12 @@ export default function CheckoutPage() {
 }
 
 function Field({ label, children, error, span = 1 }: { label: string; children: React.ReactNode; error?: string; span?: number }) {
+  const id = useId();
+  const child = isValidElement<{ id?: string }>(children) ? cloneElement(children, { id }) : children;
   return (
     <div className="field" style={{ gridColumn: span === 2 ? "span 2" : undefined }}>
-      <label>{label}</label>
-      {children}
+      <label htmlFor={id}>{label}</label>
+      {child}
       {error && <div style={{ color: "#a55", fontSize: 12, marginTop: 4 }}>{error}</div>}
     </div>
   );

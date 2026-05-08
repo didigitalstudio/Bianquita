@@ -7,8 +7,14 @@ test.describe("Checkout (guest, transfer)", () => {
     const firstCard = page.locator('a[href^="/producto/"]').first();
     await firstCard.click();
 
-    // First in-stock size button (some sizes are disabled when stock = 0)
-    const sizeButton = page.locator("button").filter({ hasText: /^(0-3M|3-6M|RN|2|4|6|Único)$/ }).first();
+    // Click the first in-stock size (out-of-stock buttons are disabled).
+    const sizeButton = page
+      .locator("button:not([disabled])")
+      .filter({
+        hasText:
+          /^(RN|0-3M|3-6M|6-9M|9-12M|12-18M|18-24M|2|3|4|6|8|10|12|14|16|XS|S|M|L|XL|Único)$/,
+      })
+      .first();
     await sizeButton.click();
     await page.getByRole("button", { name: /Agregar al carrito/i }).click();
 

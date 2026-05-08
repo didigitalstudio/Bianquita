@@ -8,6 +8,7 @@ export default async function HomePage() {
   const products = await listProducts();
   const featured = products.filter((p) => p.tags.includes("best-seller")).slice(0, 4);
   const fresh = products.filter((p) => p.tags.includes("nuevo")).slice(0, 4);
+  const heroProduct = featured[0] ?? products[0];
 
   return (
     <div className="fade-in">
@@ -46,13 +47,15 @@ export default async function HomePage() {
           </div>
           <div style={{ position: "relative", aspectRatio: "4/5", borderRadius: 28, overflow: "hidden" }}>
             <Image src="https://images.unsplash.com/photo-1607453998774-d533f65dac99?w=900&q=80" alt="Hero Unilubi Kids" fill style={{ objectFit: "cover" }} sizes="50vw" priority />
-            <div style={{ position: "absolute", bottom: 24, left: 24, right: 24, background: "rgba(251, 248, 242, 0.94)", backdropFilter: "blur(8px)", borderRadius: 16, padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <div style={{ fontSize: 11, color: "var(--brand)", fontWeight: 700, letterSpacing: "0.15em" }}>EL FAVORITO DEL FRÍO</div>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: 18, marginTop: 2 }}>Mameluco abrigadito</div>
+            {heroProduct && (
+              <div style={{ position: "absolute", bottom: 24, left: 24, right: 24, background: "rgba(251, 248, 242, 0.94)", backdropFilter: "blur(8px)", borderRadius: 16, padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: 11, color: "var(--brand)", fontWeight: 700, letterSpacing: "0.15em" }}>EL FAVORITO DEL FRÍO</div>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: 18, marginTop: 2 }}>{heroProduct.name}</div>
+                </div>
+                <Link href={`/producto/${heroProduct.id}`} className="btn btn-dark btn-sm">Ver →</Link>
               </div>
-              <Link href="/producto/p9" className="btn btn-dark btn-sm">Ver →</Link>
-            </div>
+            )}
             <div style={{ position: "absolute", top: 20, right: 20, width: 76, height: 76, borderRadius: "50%", background: "var(--brand)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", fontFamily: "var(--font-display)" }}>
               <div style={{ fontSize: 22 }}>-15%</div>
               <div style={{ fontSize: 9, letterSpacing: "0.1em" }}>OFERTA</div>
