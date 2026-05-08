@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import EmptyState from "@/components/ui/EmptyState";
-import { fmt } from "@/lib/data";
+import { fmt } from "@/lib/format";
 
 type User = { name: string; email: string } | null;
 

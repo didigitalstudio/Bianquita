@@ -1,26 +1,126 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import ProductImage from "@/components/ui/ProductImage";
 import EmptyState from "@/components/ui/EmptyState";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
-import { fmt } from "@/lib/data";
+import { fmt } from "@/lib/format";
+
+const FREE_SHIP_THRESHOLD = 35000;
+
+interface BankInfo { bank: string; cbu: string; alias: string; holder: string }
+
+interface CustomerForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  dni: string;
+  phone: string;
+}
+
+interface ShippingForm {
+  address: string;
+  city: string;
+  zip: string;
+}
+
+const SHIPPING_OPTIONS = [
+  { id: "andreani-domicilio", label: "Andreani a domicilio", sub: "3-5 días hábiles", price: 5400 },
+  { id: "andreani-sucursal", label: "Andreani sucursal", sub: "Retiro en sucursal · 2-4 días", price: 3800 },
+  { id: "cadeteria", label: "Cadetería local CABA/GBA", sub: "Hoy mismo o mañana", price: 2500 },
+  { id: "retiro", label: "Retiro en showroom", sub: "Palermo · cita previa", price: 0 },
+] as const;
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
   const { showToast } = useToast();
   const [step, setStep] = useState(1);
-  const [shipping, setShipping] = useState("andreani-domicilio");
-  const [payment, setPayment] = useState("card");
+  const [shipping, setShipping] = useState<typeof SHIPPING_OPTIONS[number]["id"]>("andreani-domicilio");
+  const [payment, setPayment] = useState<"card" | "transfer">("card");
   const [done, setDone] = useState(false);
-  const [orderId] = useState(() => `ULB-${Math.floor(Math.random() * 9000 + 1000)}`);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [bankInfo, setBankInfo] = useState<BankInfo | null>(null);
+  const [customer, setCustomer] = useState<CustomerForm>({ firstName: "", lastName: "", email: "", dni: "", phone: "" });
+  const [shipForm, setShipForm] = useState<ShippingForm>({ address: "", city: "", zip: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const shippingCost = subtotal >= 35000 ? 0 : shipping === "cadeteria" ? 2500 : shipping === "andreani-sucursal" ? 3800 : shipping === "retiro" ? 0 : 5400;
+  const shippingOpt = SHIPPING_OPTIONS.find((o) => o.id === shipping)!;
+  const shippingCost = subtotal >= FREE_SHIP_THRESHOLD ? 0 : shippingOpt.price;
   const total = subtotal + shippingCost;
+
+  useEffect(() => {
+    if (payment !== "transfer" || bankInfo) return;
+    fetch("/api/payment/bank-info").then((r) => r.json()).then(setBankInfo).catch(() => null);
+  }, [payment, bankInfo]);
+
+  const validateCustomer = (): boolean => {
+    const e: Record<string, string> = {};
+    if (!customer.firstName.trim()) e.firstName = "Requerido";
+    if (!customer.lastName.trim()) e.lastName = "Requerido";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) e.email = "Email inválido";
+    if (!/^\d{7,8}$/.test(customer.dni.replace(/\D/g, ""))) e.dni = "DNI debe tener 7-8 dígitos";
+    if (customer.phone.replace(/\D/g, "").length < 8) e.phone = "Teléfono inválido";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const validateShipping = (): boolean => {
+    if (shipping === "retiro") return true;
+    const e: Record<string, string> = {};
+    if (!shipForm.address.trim()) e.address = "Requerido";
+    if (!shipForm.city.trim()) e.city = "Requerido";
+    if (!/^\d{4,5}$/.test(shipForm.zip.replace(/\D/g, ""))) e.zip = "CP inválido";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const submitOrder = async () => {
+    setSubmitting(true);
+    setErrors({});
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: {
+            name: `${customer.firstName} ${customer.lastName}`.trim(),
+            email: customer.email,
+            phone: customer.phone,
+            dni: customer.dni,
+          },
+          shipping: {
+            method: shipping,
+            address: shipForm.address,
+            city: shipForm.city,
+            zip: shipForm.zip,
+          },
+          payment: { method: payment },
+          items: cart,
+          shippingCost,
+          subtotal,
+          total,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || "No pudimos crear el pedido");
+        setSubmitting(false);
+        return;
+      }
+      clearCart();
+      setOrderNumber(data.orderNumber);
+      setDone(true);
+      showToast("¡Pedido confirmado!");
+    } catch {
+      showToast("Error de conexión. Probá de nuevo.");
+      setSubmitting(false);
+    }
+  };
 
   if (cart.length === 0 && !done) {
     return (
@@ -38,7 +138,7 @@ export default function CheckoutPage() {
             <Icon name="check" size={36} />
           </div>
           <h1 className="h2" style={{ marginBottom: 12 }}>¡Gracias por tu compra!</h1>
-          <p className="muted" style={{ marginBottom: 8 }}>Pedido <strong style={{ color: "var(--brand)" }}>{orderId}</strong></p>
+          <p className="muted" style={{ marginBottom: 8 }}>Pedido <strong style={{ color: "var(--brand)" }}>{orderNumber}</strong></p>
           <p className="soft" style={{ marginBottom: 32 }}>Te enviamos un mail de confirmación. Tu pedido se despacha en las próximas 48 hs hábiles.</p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
             <Link href="/cuenta" className="btn btn-primary">Ver mis pedidos</Link>
@@ -68,13 +168,23 @@ export default function CheckoutPage() {
             <div className="card" style={{ padding: 28 }}>
               <div className="h3" style={{ marginBottom: 20 }}>Tus datos</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                <div className="field"><label>Nombre</label><input className="input" defaultValue="María" /></div>
-                <div className="field"><label>Apellido</label><input className="input" defaultValue="Fernández" /></div>
-                <div className="field" style={{ gridColumn: "span 2" }}><label>Email</label><input className="input" defaultValue="maria@email.com" /></div>
-                <div className="field"><label>DNI</label><input className="input" defaultValue="32145678" /></div>
-                <div className="field"><label>Teléfono</label><input className="input" defaultValue="+54 11 5198-2734" /></div>
+                <Field label="Nombre" error={errors.firstName}>
+                  <input className="input" value={customer.firstName} onChange={(e) => setCustomer({ ...customer, firstName: e.target.value })} autoComplete="given-name" />
+                </Field>
+                <Field label="Apellido" error={errors.lastName}>
+                  <input className="input" value={customer.lastName} onChange={(e) => setCustomer({ ...customer, lastName: e.target.value })} autoComplete="family-name" />
+                </Field>
+                <Field label="Email" error={errors.email} span={2}>
+                  <input className="input" type="email" value={customer.email} onChange={(e) => setCustomer({ ...customer, email: e.target.value })} autoComplete="email" />
+                </Field>
+                <Field label="DNI" error={errors.dni}>
+                  <input className="input" inputMode="numeric" value={customer.dni} onChange={(e) => setCustomer({ ...customer, dni: e.target.value })} maxLength={9} />
+                </Field>
+                <Field label="Teléfono" error={errors.phone}>
+                  <input className="input" type="tel" value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value })} autoComplete="tel" />
+                </Field>
               </div>
-              <button className="btn btn-primary" style={{ marginTop: 24 }} onClick={() => setStep(2)}>Continuar →</button>
+              <button className="btn btn-primary" style={{ marginTop: 24 }} onClick={() => { if (validateCustomer()) setStep(2); }}>Continuar →</button>
             </div>
           )}
 
@@ -82,12 +192,7 @@ export default function CheckoutPage() {
             <div className="card" style={{ padding: 28 }}>
               <div className="h3" style={{ marginBottom: 20 }}>¿Cómo querés recibirlo?</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
-                {[
-                  { id: "andreani-domicilio", label: "Andreani a domicilio", sub: "3-5 días hábiles", price: 5400 },
-                  { id: "andreani-sucursal", label: "Andreani sucursal", sub: "Retiro en sucursal · 2-4 días", price: 3800 },
-                  { id: "cadeteria", label: "Cadetería local CABA/GBA", sub: "Hoy mismo o mañana", price: 2500 },
-                  { id: "retiro", label: "Retiro en showroom", sub: "Palermo · cita previa", price: 0 },
-                ].map((opt) => (
+                {SHIPPING_OPTIONS.map((opt) => (
                   <button key={opt.id} onClick={() => setShipping(opt.id)} style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, border: shipping === opt.id ? "2px solid var(--brand)" : "1px solid var(--line)", borderRadius: 14, textAlign: "left", background: shipping === opt.id ? "var(--brand-soft)" : "#fff" }}>
                     <span style={{ width: 18, height: 18, borderRadius: "50%", border: "2px solid var(--brand)", background: shipping === opt.id ? "var(--brand)" : "transparent", flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
@@ -100,14 +205,20 @@ export default function CheckoutPage() {
               </div>
               {shipping !== "retiro" && (
                 <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 14 }}>
-                  <div className="field"><label>Dirección</label><input className="input" defaultValue="Av. Cabildo 2840" /></div>
-                  <div className="field"><label>Ciudad</label><input className="input" defaultValue="CABA" /></div>
-                  <div className="field"><label>CP</label><input className="input" defaultValue="1428" /></div>
+                  <Field label="Dirección" error={errors.address}>
+                    <input className="input" value={shipForm.address} onChange={(e) => setShipForm({ ...shipForm, address: e.target.value })} autoComplete="street-address" />
+                  </Field>
+                  <Field label="Ciudad" error={errors.city}>
+                    <input className="input" value={shipForm.city} onChange={(e) => setShipForm({ ...shipForm, city: e.target.value })} autoComplete="address-level2" />
+                  </Field>
+                  <Field label="CP" error={errors.zip}>
+                    <input className="input" inputMode="numeric" value={shipForm.zip} onChange={(e) => setShipForm({ ...shipForm, zip: e.target.value })} autoComplete="postal-code" maxLength={5} />
+                  </Field>
                 </div>
               )}
               <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
                 <button className="btn btn-ghost" onClick={() => setStep(1)}>← Atrás</button>
-                <button className="btn btn-primary" onClick={() => setStep(3)}>Continuar →</button>
+                <button className="btn btn-primary" onClick={() => { if (validateShipping()) setStep(3); }}>Continuar →</button>
               </div>
             </div>
           )}
@@ -116,10 +227,10 @@ export default function CheckoutPage() {
             <div className="card" style={{ padding: 28 }}>
               <div className="h3" style={{ marginBottom: 20 }}>Método de pago</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
-                {[
+                {([
                   { id: "card", label: "Tarjeta de crédito o débito", sub: "Visa, Mastercard, Amex · Hasta 12 cuotas", icon: "card" },
                   { id: "transfer", label: "Transferencia bancaria", sub: "10% de descuento adicional", icon: "bank" },
-                ].map((opt) => (
+                ] as const).map((opt) => (
                   <button key={opt.id} onClick={() => setPayment(opt.id)} style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, border: payment === opt.id ? "2px solid var(--brand)" : "1px solid var(--line)", borderRadius: 14, textAlign: "left", background: payment === opt.id ? "var(--brand-soft)" : "#fff" }}>
                     <span style={{ width: 18, height: 18, borderRadius: "50%", border: "2px solid var(--brand)", background: payment === opt.id ? "var(--brand)" : "transparent", flexShrink: 0 }} />
                     <Icon name={opt.icon} size={22} />
@@ -131,31 +242,27 @@ export default function CheckoutPage() {
                 ))}
               </div>
               {payment === "card" && (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                  <div className="field" style={{ gridColumn: "span 2" }}><label>Número de tarjeta</label><input className="input" placeholder="•••• •••• •••• ••••" /></div>
-                  <div className="field" style={{ gridColumn: "span 2" }}><label>Nombre en la tarjeta</label><input className="input" /></div>
-                  <div className="field"><label>Vencimiento</label><input className="input" placeholder="MM/AA" /></div>
-                  <div className="field"><label>CVV</label><input className="input" placeholder="123" /></div>
-                  <div className="field" style={{ gridColumn: "span 2" }}>
-                    <label>Cuotas</label>
-                    <select className="select">
-                      <option>1 cuota de {fmt(total)}</option>
-                      <option>3 cuotas sin interés de {fmt(Math.round(total / 3))}</option>
-                      <option>6 cuotas de {fmt(Math.round(total / 6))}</option>
-                      <option>12 cuotas de {fmt(Math.round(total / 12))}</option>
-                    </select>
-                  </div>
+                <div className="card-soft" style={{ padding: 18, fontSize: 13, color: "var(--ink-soft)" }}>
+                  El pago con tarjeta se procesará vía MercadoPago. (Integración pendiente — al confirmar, el pedido queda en estado &quot;pendiente de pago&quot; y nos comunicamos con vos.)
                 </div>
               )}
               {payment === "transfer" && (
                 <div className="card-soft" style={{ padding: 18, fontSize: 14 }}>
                   <p style={{ margin: 0, marginBottom: 8 }}><strong>Datos para transferir:</strong></p>
-                  <p style={{ margin: 0, color: "var(--ink-soft)" }}>Banco Galicia · CBU 0070123456789012345678 · Alias unilubi.kids · Titular: Unilubi SRL</p>
+                  {bankInfo ? (
+                    <p style={{ margin: 0, color: "var(--ink-soft)" }}>
+                      {bankInfo.bank}{bankInfo.cbu ? ` · CBU ${bankInfo.cbu}` : ""}{bankInfo.alias ? ` · Alias ${bankInfo.alias}` : ""}{bankInfo.holder ? ` · Titular: ${bankInfo.holder}` : ""}
+                    </p>
+                  ) : (
+                    <p style={{ margin: 0, color: "var(--ink-mute)" }}>Cargando datos bancarios…</p>
+                  )}
                 </div>
               )}
               <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
-                <button className="btn btn-ghost" onClick={() => setStep(2)}>← Atrás</button>
-                <button className="btn btn-primary" onClick={() => { clearCart(); setDone(true); showToast("¡Pedido confirmado!"); }}>Pagar {fmt(total)}</button>
+                <button className="btn btn-ghost" onClick={() => setStep(2)} disabled={submitting}>← Atrás</button>
+                <button className="btn btn-primary" disabled={submitting} onClick={submitOrder}>
+                  {submitting ? "Procesando…" : `Confirmar pedido · ${fmt(total)}`}
+                </button>
               </div>
             </div>
           )}
@@ -186,6 +293,16 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Field({ label, children, error, span = 1 }: { label: string; children: React.ReactNode; error?: string; span?: number }) {
+  return (
+    <div className="field" style={{ gridColumn: span === 2 ? "span 2" : undefined }}>
+      <label>{label}</label>
+      {children}
+      {error && <div style={{ color: "#a55", fontSize: 12, marginTop: 4 }}>{error}</div>}
     </div>
   );
 }

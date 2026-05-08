@@ -1,22 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import ProductImage from "@/components/ui/ProductImage";
-import { PRODUCTS, fmt } from "@/lib/data";
+import { fmt } from "@/lib/format";
 
 interface SearchOverlayProps {
   open: boolean;
   onClose: () => void;
 }
 
+interface SearchResult {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  compareAt: number | null;
+  img: string;
+  category: string;
+  tags: string[];
+}
+
 export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const [q, setQ] = useState("");
-  if (!open) return null;
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [trending, setTrending] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const results = q ? PRODUCTS.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()) || p.category.includes(q.toLowerCase())).slice(0, 6) : [];
-  const trending = PRODUCTS.filter((p) => p.tags.includes("best-seller")).slice(0, 4);
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/products/search?limit=4")
+      .then((r) => r.json())
+      .then((d) => setTrending(d.results ?? []))
+      .catch(() => setTrending([]));
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!q.trim()) {
+      setResults([]);
+      return;
+    }
+    setLoading(true);
+    debounceRef.current = setTimeout(() => {
+      fetch(`/api/products/search?q=${encodeURIComponent(q)}&limit=6`)
+        .then((r) => r.json())
+        .then((d) => setResults(d.results ?? []))
+        .catch(() => setResults([]))
+        .finally(() => setLoading(false));
+    }, 200);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [q, open]);
+
+  if (!open) return null;
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,35,29,0.55)", zIndex: 100, animation: "fadeIn .2s", display: "flex", justifyContent: "center", alignItems: "flex-start", paddingTop: 80 }}>
@@ -24,11 +65,15 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
         <div style={{ display: "flex", alignItems: "center", gap: 12, paddingBottom: 16, borderBottom: "1px solid var(--line)" }}>
           <Icon name="search" size={20} />
           <input autoFocus className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="¿Qué estás buscando?" style={{ border: "none", padding: 0, fontSize: 18, background: "transparent", flex: 1 }} />
-          <button className="btn-icon" onClick={onClose}><Icon name="x" /></button>
+          <button className="btn-icon" onClick={onClose} aria-label="Cerrar buscador"><Icon name="x" /></button>
         </div>
         <div style={{ paddingTop: 20 }}>
           {q ? (
-            results.length === 0 ? <p className="muted" style={{ padding: 20, textAlign: "center" }}>Sin resultados para &quot;{q}&quot;</p> : (
+            loading ? (
+              <p className="muted" style={{ padding: 20, textAlign: "center" }}>Buscando…</p>
+            ) : results.length === 0 ? (
+              <p className="muted" style={{ padding: 20, textAlign: "center" }}>Sin resultados para &quot;{q}&quot;</p>
+            ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {results.map((p) => (
                   <Link key={p.id} href={`/producto/${p.id}`} onClick={onClose} style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", gap: 14, padding: 10, borderRadius: 12, textAlign: "left" }}>

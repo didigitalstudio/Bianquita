@@ -2,11 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import Icon from "@/components/ui/Icon";
 import ProductCard from "@/components/shop/ProductCard";
-import { PRODUCTS } from "@/lib/data";
+import { listProducts } from "@/lib/data/products";
 
-export default function HomePage() {
-  const featured = PRODUCTS.filter((p) => p.tags.includes("best-seller")).slice(0, 4);
-  const fresh = PRODUCTS.filter((p) => p.tags.includes("nuevo")).slice(0, 4);
+export default async function HomePage() {
+  const products = await listProducts();
+  const featured = products.filter((p) => p.tags.includes("best-seller")).slice(0, 4);
+  const fresh = products.filter((p) => p.tags.includes("nuevo")).slice(0, 4);
 
   return (
     <div className="fade-in">
