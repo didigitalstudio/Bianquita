@@ -2,12 +2,30 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import ShellWrapper from "@/components/layout/ShellWrapper";
+import { BRAND } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Unilubi Kids — Indumentaria infantil",
-  description: "Indumentaria infantil de diseño argentino. Colecciones de temporada con envíos a todo el país.",
+  metadataBase: new URL(BRAND.url),
+  title: {
+    default: `${BRAND.name} — Indumentaria infantil argentina`,
+    template: `%s — ${BRAND.name}`,
+  },
+  description: BRAND.description,
   icons: { icon: "/logo.png" },
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    siteName: BRAND.name,
+    title: `${BRAND.name} — Indumentaria infantil argentina`,
+    description: BRAND.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${BRAND.name} — Indumentaria infantil argentina`,
+    description: BRAND.description,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -16,13 +34,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=DM+Serif+Display&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
       </head>
       <body>
         <CartProvider>
-          <ToastProvider>
-            <ShellWrapper>{children}</ShellWrapper>
-          </ToastProvider>
+          <WishlistProvider>
+            <ToastProvider>
+              <ShellWrapper>{children}</ShellWrapper>
+            </ToastProvider>
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

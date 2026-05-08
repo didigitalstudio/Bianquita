@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import ProductImage from "@/components/ui/ProductImage";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
+import { useToast } from "@/context/ToastContext";
 import { fmt } from "@/lib/format";
 import type { Product } from "@/lib/types";
 
@@ -15,8 +18,24 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, bg }: ProductCardProps) {
   const { addToCart } = useCart();
+  const { isInWishlist, toggle } = useWishlist();
+  const { showToast } = useToast();
+  const router = useRouter();
   const [hovering, setHovering] = useState(false);
   const [showSizes, setShowSizes] = useState(false);
+  const inWishlist = isInWishlist(product.id);
+
+  const onToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const res = await toggle(product.id);
+    if (res === null) {
+      showToast("Iniciá sesión para guardar favoritos");
+      router.push("/cuenta/login");
+      return;
+    }
+    showToast(res.added ? "Agregado a favoritos ❤" : "Quitado de favoritos");
+  };
   const onSale = !!product.compareAt;
   const sizes = Object.keys(product.stock || {}).filter((s) => product.stock[s] > 0);
   const transferPrice = Math.round(product.price * 0.8);
@@ -44,8 +63,9 @@ export default function ProductCard({ product, bg }: ProductCardProps) {
           {onSale && <span className="badge badge-salvia">Oferta</span>}
         </div>
         <button
-          onClick={(e) => e.preventDefault()}
-          style={{ position: "absolute", top: 12, right: 12, width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.85)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={onToggleWishlist}
+          aria-label={inWishlist ? "Quitar de favoritos" : "Agregar a favoritos"}
+          style={{ position: "absolute", top: 12, right: 12, width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.85)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", color: inWishlist ? "var(--brand)" : "var(--ink)" }}
         >
           <Icon name="heart" size={16} />
         </button>

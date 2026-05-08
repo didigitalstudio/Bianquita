@@ -8,8 +8,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
 import { fmt } from "@/lib/format";
-
-const FREE_SHIP_THRESHOLD = 35000;
+import { FREE_SHIP_THRESHOLD, TRANSFER_DISCOUNT } from "@/lib/constants";
 
 interface BankInfo { bank: string; cbu: string; alias: string; holder: string }
 
@@ -51,7 +50,8 @@ export default function CheckoutPage() {
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const shippingOpt = SHIPPING_OPTIONS.find((o) => o.id === shipping)!;
   const shippingCost = subtotal >= FREE_SHIP_THRESHOLD ? 0 : shippingOpt.price;
-  const total = subtotal + shippingCost;
+  const transferDiscount = payment === "transfer" ? Math.round(subtotal * TRANSFER_DISCOUNT) : 0;
+  const total = subtotal + shippingCost - transferDiscount;
 
   useEffect(() => {
     if (payment !== "transfer" || bankInfo) return;
@@ -287,8 +287,11 @@ export default function CheckoutPage() {
             </div>
             <div style={{ borderTop: "1px solid var(--line)", paddingTop: 14, fontSize: 14, color: "var(--ink-soft)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}><span>Envío</span><span>{shippingCost === 0 ? "Gratis" : fmt(shippingCost)}</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-display)", fontSize: 22, color: "var(--ink)" }}><span>Total</span><span style={{ color: "var(--brand)" }}>{fmt(total)}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}><span>Envío</span><span>{shippingCost === 0 ? "Gratis" : fmt(shippingCost)}</span></div>
+              {transferDiscount > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, color: "var(--salvia-deep)" }}><span>Descuento transferencia (10%)</span><span>−{fmt(transferDiscount)}</span></div>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontFamily: "var(--font-display)", fontSize: 22, color: "var(--ink)" }}><span>Total</span><span style={{ color: "var(--brand)" }}>{fmt(total)}</span></div>
             </div>
           </div>
         </div>

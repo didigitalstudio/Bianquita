@@ -3,11 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import ProductCard from "@/components/shop/ProductCard";
 import { fmt } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
+import { useWishlist } from "@/context/WishlistContext";
 import type { Product, Audience } from "@/lib/types";
 
 const COLOR_HEX: Record<string, string> = {
@@ -19,11 +21,15 @@ interface Props {
   product: Product;
   audiences: Audience[];
   related: Product[];
+  ratingAverage: number;
+  ratingCount: number;
 }
 
-export default function ProductDetail({ product, audiences, related }: Props) {
+export default function ProductDetail({ product, audiences, related, ratingAverage, ratingCount }: Props) {
   const { addToCart, openCart } = useCart();
   const { showToast } = useToast();
+  const { isInWishlist, toggle } = useWishlist();
+  const router = useRouter();
 
   const sizes = Object.keys(product.stock);
   const [size, setSize] = useState(sizes.find((s) => product.stock[s] > 0) || sizes[0]);
@@ -37,6 +43,17 @@ export default function ProductDetail({ product, audiences, related }: Props) {
     showToast(`${product.name} agregado al carrito`);
     openCart();
   };
+
+  const onWishlist = async () => {
+    const res = await toggle(product.id);
+    if (res === null) {
+      showToast("Iniciá sesión para guardar favoritos");
+      router.push("/cuenta/login");
+      return;
+    }
+    showToast(res.added ? "Agregado a favoritos ❤" : "Quitado de favoritos");
+  };
+  const inWishlist = isInWishlist(product.id);
 
   return (
     <div className="fade-in">
@@ -69,8 +86,12 @@ export default function ProductDetail({ product, audiences, related }: Props) {
             </div>
             <h1 className="h2" style={{ marginBottom: 8 }}>{product.name}</h1>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
-              <div style={{ display: "flex", gap: 2, color: "var(--brand)" }}>{[1, 2, 3, 4, 5].map((i) => <Icon key={i} name="star" size={14} />)}</div>
-              <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>4.9 · 128 opiniones</span>
+              <div style={{ display: "flex", gap: 2, color: "var(--brand)" }}>
+                {[1, 2, 3, 4, 5].map((i) => <Icon key={i} name="star" size={14} />)}
+              </div>
+              <span style={{ fontSize: 13, color: "var(--ink-soft)" }}>
+                {ratingCount === 0 ? "Aún sin reseñas" : `${ratingAverage.toFixed(1)} · ${ratingCount} ${ratingCount === 1 ? "reseña" : "reseñas"}`}
+              </span>
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 8 }}>
               <span style={{ fontFamily: "var(--font-display)", fontSize: 36, color: "var(--brand)" }}>{fmt(product.price)}</span>
@@ -114,7 +135,7 @@ export default function ProductDetail({ product, audiences, related }: Props) {
               <button className="btn btn-primary btn-lg" disabled={!inStock} onClick={onAdd} style={{ flex: 1 }}>
                 {inStock ? <>Agregar al carrito · {fmt(product.price * qty)}</> : "Sin stock en este talle"}
               </button>
-              <button className="btn btn-ghost btn-lg" aria-label="Agregar a favoritos" style={{ width: 52, height: 52 }}><Icon name="heart" /></button>
+              <button onClick={onWishlist} className="btn btn-ghost btn-lg" aria-label={inWishlist ? "Quitar de favoritos" : "Agregar a favoritos"} style={{ width: 52, height: 52, color: inWishlist ? "var(--brand)" : "inherit" }}><Icon name="heart" /></button>
             </div>
             <Link href="/checkout" className="btn btn-dark btn-lg" onClick={onAdd} style={{ width: "100%", marginBottom: 28, display: "flex", justifyContent: "center" }}>
               Comprar ahora →
