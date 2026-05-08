@@ -1,0 +1,190 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+# Cancel in-flight runs on the same ref to save CI minutes.
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────
+  # 1. Unit tests (Vitest jsdom + node, no external services)
+  # ──────────────────────────────────────────────────────────────────────
+  unit-tests:
+    name: Unit tests (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Vitest unit + server
+        run: npx vitest run --project unit --project server --reporter=default --reporter=junit --outputFile=unit-results.xml
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-results
+          path: unit-results.xml
+          retention-days: 7
+
+  # ──────────────────────────────────────────────────────────────────────
+  # 2. DB / RLS tests (Vitest against the configured Supabase project)
+  # ──────────────────────────────────────────────────────────────────────
+  db-tests:
+    name: DB & RLS tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Run RLS tests
+        env:
+          STAGING_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          STAGING_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.STAGING_SUPABASE_PUBLISHABLE_KEY }}
+          STAGING_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.STAGING_SUPABASE_SERVICE_ROLE_KEY }}
+        run: npx vitest run --project db --reporter=default --reporter=junit --outputFile=db-results.xml
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-results
+          path: db-results.xml
+          retention-days: 7
+
+  # ──────────────────────────────────────────────────────────────────────
+  # 3. Email tests (Resend SDK mocked, no external calls)
+  #    Kept as its own job so a flaky email mock doesn't block the unit suite.
+  # ──────────────────────────────────────────────────────────────────────
+  email-tests:
+    name: Email tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Run email tests
+        env:
+          # Mocked, but the lib reads the key to decide whether to send.
+          RESEND_API_KEY: ${{ secrets.RESEND_TEST_API_KEY || 're_test_key' }}
+          RESEND_FROM_EMAIL: 'Unilubi Kids <hola@unilubikids.com.ar>'
+        run: npx vitest run --project server tests/server/email.test.ts
+
+  # ──────────────────────────────────────────────────────────────────────
+  # 4. E2E tests (Playwright against the Vercel preview URL)
+  # ──────────────────────────────────────────────────────────────────────
+  e2e-tests:
+    name: E2E tests (Playwright)
+    runs-on: ubuntu-latest
+    # Only meaningful on PRs (Vercel preview) and pushes to master (production).
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # On PRs, wait for the Vercel preview deployment to finish so we can hit it.
+      - name: Wait for Vercel preview
+        if: github.event_name == 'pull_request'
+        id: vercel
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 600
+          check_interval: 10
+
+      - name: Compute base URL
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "url=${{ steps.vercel.outputs.url }}" >> $GITHUB_OUTPUT
+          else
+            echo "url=${{ secrets.PRODUCTION_URL || 'https://unilubi.vercel.app' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright
+        env:
+          BASE_URL: ${{ steps.base.outputs.url }}
+          CI: true
+        run: npx playwright test --project=chromium
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  # ──────────────────────────────────────────────────────────────────────
+  # 5. PR summary comment (rolls up the 4 jobs above)
+  # ──────────────────────────────────────────────────────────────────────
+  pr-summary:
+    name: PR summary
+    if: github.event_name == 'pull_request' && always()
+    needs: [unit-tests, db-tests, email-tests, e2e-tests]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const status = (n) => ({
+              success: '✅ pass',
+              failure: '❌ fail',
+              cancelled: '⚪️ cancelled',
+              skipped: '⚪️ skipped',
+            }[n] || `⚠️ ${n}`);
+
+            const results = {
+              'Unit (Vitest)': '${{ needs.unit-tests.result }}',
+              'DB / RLS':      '${{ needs.db-tests.result }}',
+              'Email':         '${{ needs.email-tests.result }}',
+              'E2E (Playwright)': '${{ needs.e2e-tests.result }}',
+            };
+
+            const body = [
+              '### 🧪 Test results',
+              '',
+              '| Suite | Status |',
+              '| --- | --- |',
+              ...Object.entries(results).map(([name, r]) => `| ${name} | ${status(r)} |`),
+              '',
+              `Run: [#${context.runId}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+            ].join('\n');
+
+            // Edit the previous comment if we left one, otherwise post a new one.
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo, issue_number: context.issue.number,
+            });
+            const previous = comments.find((c) =>
+              c.user?.type === 'Bot' && c.body?.startsWith('### 🧪 Test results'),
+            );
+            if (previous) {
+              await github.rest.issues.updateComment({ ...context.repo, comment_id: previous.id, body });
+            } else {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
+            }
