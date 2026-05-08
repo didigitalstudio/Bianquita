@@ -54,7 +54,7 @@ export default function AdminClient({ initialProducts, initialOrders, categories
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", minHeight: "100vh", background: "#FAF6EE" }}>
+    <div className="admin-shell" style={{ background: "#FAF6EE" }}>
       <aside style={{ background: "var(--ink)", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "8px 12px 24px", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 20 }}>
           <Logo size="sm" inverted />

@@ -155,7 +155,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="fade-in" style={{ padding: "32px 0 80px" }}>
-      <div className="container-wide" style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 60 }}>
+      <div className="container-wide checkout-grid">
         <div>
           <h1 className="h2" style={{ marginBottom: 8 }}>Finalizar compra</h1>
           <div style={{ display: "flex", gap: 8, marginBottom: 32, fontSize: 13 }}>

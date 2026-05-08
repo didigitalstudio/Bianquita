@@ -24,6 +24,7 @@ export default function TiendaClient({ products, categories, audiences }: Props)
   const [filterAud, setFilterAud] = useState<string | null>(searchParams.get("audience"));
   const [filterTag, setFilterTag] = useState<string | null>(searchParams.get("tag"));
   const [priceMax, setPriceMax] = useState(35000);
+  const [mobileFilters, setMobileFilters] = useState(false);
 
   useEffect(() => {
     setFilterAud(searchParams.get("audience"));
@@ -77,8 +78,16 @@ export default function TiendaClient({ products, categories, audiences }: Props)
       </section>
 
       <section style={{ padding: "32px 0 80px" }}>
-        <div className="container-wide" style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 40 }}>
-          <aside style={{ position: "sticky", top: 100, alignSelf: "start", maxHeight: "calc(100vh - 120px)", overflowY: "auto" }}>
+        <div className="container-wide tienda-grid">
+          <button
+            type="button"
+            className="btn btn-ghost tienda-filters-toggle"
+            onClick={() => setMobileFilters((v) => !v)}
+            aria-expanded={mobileFilters}
+          >
+            <Icon name="filter" size={14} /> {mobileFilters ? "Ocultar filtros" : "Filtros"}
+          </button>
+          <aside data-open={mobileFilters} className="tienda-aside" style={{ position: "sticky", top: 100, alignSelf: "start", maxHeight: "calc(100vh - 120px)", overflowY: "auto" }}>
             <FilterBlock title="Edad">
               {audiences.map((a) => (
                 <FilterRow key={a.id} active={filterAud === a.id} onClick={() => setFilterAud(filterAud === a.id ? null : a.id)}>
@@ -122,7 +131,7 @@ export default function TiendaClient({ products, categories, audiences }: Props)
                 <button className="btn btn-ghost" onClick={() => { setFilterCat(null); setFilterAud(null); setFilterTag(null); }}>Limpiar filtros</button>
               } />
             ) : view === "grid" ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+              <div className="product-grid-3">
                 {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
               </div>
             ) : (

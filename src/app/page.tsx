@@ -15,7 +15,7 @@ export default async function HomePage() {
       <section style={{ position: "relative", overflow: "hidden", background: "var(--cream)", padding: "80px 0 100px" }}>
         <div style={{ position: "absolute", top: 80, right: -60, width: 260, height: 260, borderRadius: "50%", background: "var(--brand-soft)", opacity: 0.5, filter: "blur(40px)" }} />
         <div style={{ position: "absolute", bottom: 40, left: -80, width: 220, height: 220, borderRadius: "50%", background: "rgba(156, 168, 136, 0.3)", filter: "blur(50px)" }} />
-        <div className="container-wide" style={{ position: "relative", display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 80, alignItems: "center" }}>
+        <div className="container-wide hero-grid" style={{ position: "relative" }}>
           <div>
             <div style={{ marginBottom: 24 }}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 12, color: "var(--brand)" }}>
@@ -63,7 +63,7 @@ export default async function HomePage() {
 
       {/* PROMO STRIP */}
       <section style={{ background: "var(--paper)", borderTop: "1px solid var(--line-soft)", borderBottom: "1px solid var(--line-soft)" }}>
-        <div className="container-wide" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", padding: "20px 24px" }}>
+        <div className="container-wide promo-grid">
           {[
             { icon: "truck", title: "Envío gratis", sub: "Superando los $35.000" },
             { icon: "bank", title: "20% off transferencia", sub: "Descuento automático" },
@@ -93,7 +93,7 @@ export default async function HomePage() {
             </div>
             <Link href="/tienda" className="btn-link">Ver todo →</Link>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+          <div className="cat-grid-4">
             {[
               { id: "recien-nacido", title: "Recién nacido", sub: "0 a 3 meses", img: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=600&q=80", href: "/tienda?audience=recien-nacido" },
               { id: "bebe", title: "Bebé", sub: "3 a 24 meses", img: "https://images.unsplash.com/photo-1522771930-78848d9293e8?w=600&q=80", href: "/tienda?audience=bebe" },
@@ -120,7 +120,7 @@ export default async function HomePage() {
             <div className="eyebrow" style={{ marginBottom: 10 }}>· Cápsulas ·</div>
             <h2 className="h2">Colecciones que vas a amar</h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr", gap: 16, gridAutoRows: "minmax(220px, auto)" }}>
+          <div className="capsule-grid">
             <Link href="/tienda?audience=recien-nacido" style={{ borderRadius: 22, overflow: "hidden", position: "relative", textAlign: "left", gridRow: "span 2", display: "block" }}>
               <Image src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=900&q=80" alt="Cápsula recién nacido" fill style={{ objectFit: "cover" }} sizes="40vw" />
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(43,35,29,0.1) 30%, rgba(43,35,29,0.7))" }} />
@@ -160,7 +160,7 @@ export default async function HomePage() {
             </div>
             <Link href="/tienda" className="btn-link">Ver todo →</Link>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+          <div className="product-grid-4">
             {featured.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
         </div>
@@ -183,7 +183,7 @@ export default async function HomePage() {
 
       {/* EDITORIAL SPLIT */}
       <section style={{ padding: "96px 0" }}>
-        <div className="container-wide" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
+        <div className="container-wide editorial-split">
           <div style={{ aspectRatio: "1/1", borderRadius: 22, overflow: "hidden", background: "var(--cream)", position: "relative" }}>
             <Image src="https://images.unsplash.com/photo-1519278409-1f56fdda7fe5?w=900&q=80" alt="Nosotros" fill style={{ objectFit: "cover" }} sizes="50vw" />
           </div>
@@ -211,7 +211,7 @@ export default async function HomePage() {
             </div>
             <Link href="/tienda?tag=nuevo" className="btn-link">Ver todo →</Link>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+          <div className="product-grid-4">
             {fresh.map((p) => <ProductCard key={p.id} product={p} bg="#fff" />)}
           </div>
         </div>
@@ -224,7 +224,7 @@ export default async function HomePage() {
           <h2 className="h2" style={{ marginBottom: 8 }}>@unilubikids</h2>
           <p className="muted">Etiquetanos y mostranos cómo viven nuestras prendas. ¡Nos encanta verlos!</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4 }}>
+        <div className="insta-grid">
           {[
             "https://images.unsplash.com/photo-1503944168849-8bf86875b08e?w=400&q=80",
             "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=400&q=80",
