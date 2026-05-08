@@ -1,5 +1,6 @@
 export interface Product {
   id: string;
+  slug?: string;
   name: string;
   category: string;
   audience: string;
@@ -12,6 +13,8 @@ export interface Product {
   care: string;
   tags: string[];
   img: string;
+  images?: string[];
+  active?: boolean;
 }
 
 export interface Order {
@@ -19,7 +22,7 @@ export interface Order {
   customer: string;
   email: string;
   date: string;
-  status: "pendiente-pago" | "preparando" | "enviado" | "entregado";
+  status: "pendiente-pago" | "preparando" | "enviado" | "entregado" | "cancelado";
   items: number;
   total: number;
   payment: string;

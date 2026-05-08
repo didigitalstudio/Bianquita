@@ -5,7 +5,7 @@ import Icon from "@/components/ui/Icon";
 import ProductImage from "@/components/ui/ProductImage";
 import EmptyState from "@/components/ui/EmptyState";
 import { useCart } from "@/context/CartContext";
-import { fmt } from "@/lib/data";
+import { fmt } from "@/lib/format";
 
 interface CartDrawerProps {
   open: boolean;

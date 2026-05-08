@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import type { CartItem } from "@/lib/types";
+import { safeJsonParse } from "@/lib/utils";
 
 interface CartContextValue {
   cart: CartItem[];
@@ -21,10 +22,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("unilubi-cart");
-      if (saved) setCart(JSON.parse(saved));
-    } catch {}
+    setCart(safeJsonParse<CartItem[]>(localStorage.getItem("unilubi-cart"), []));
   }, []);
 
   useEffect(() => {
