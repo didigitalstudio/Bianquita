@@ -23,7 +23,6 @@ const secondaryLinks = [
   { l: "Envíos", href: "/envios" },
   { l: "Preguntas frecuentes", href: "/faq" },
   { l: "Contacto", href: "/contacto" },
-  { l: "Admin", href: "/admin" },
 ];
 
 export default function SideMenu({ open, onClose }: SideMenuProps) {

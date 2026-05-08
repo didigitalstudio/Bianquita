@@ -100,6 +100,36 @@ export async function sendOrderConfirmationEmail(order: OrderRow): Promise<void>
   });
 }
 
+interface ContactMessage {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export async function sendContactMessageEmail(msg: ContactMessage): Promise<void> {
+  const resend = getResend();
+  const inbox = process.env.CONTACT_INBOX ?? "hola@unilubikids.com.ar";
+  if (!resend) return;
+  const escapeHtml = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const content = `
+    <p style="font-size:14px;color:#6B5E50;margin:0 0 4px;">De</p>
+    <p style="font-size:15px;margin:0 0 16px;"><strong>${escapeHtml(msg.name)}</strong> · <a href="mailto:${escapeHtml(msg.email)}" style="color:#B5663D;">${escapeHtml(msg.email)}</a></p>
+    <p style="font-size:14px;color:#6B5E50;margin:0 0 4px;">Asunto</p>
+    <p style="font-size:15px;margin:0 0 16px;">${escapeHtml(msg.subject)}</p>
+    <p style="font-size:14px;color:#6B5E50;margin:0 0 4px;">Mensaje</p>
+    <p style="font-size:15px;line-height:1.6;white-space:pre-wrap;margin:0;">${escapeHtml(msg.message)}</p>
+  `;
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: inbox,
+    replyTo: msg.email,
+    subject: `[Contacto] ${msg.subject} — ${msg.name}`,
+    html: htmlShell("Nuevo mensaje desde la web", content),
+  });
+}
+
 export async function sendOrderStatusEmail(order: OrderRow): Promise<void> {
   const resend = getResend();
   if (!resend) return;

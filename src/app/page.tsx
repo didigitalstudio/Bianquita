@@ -241,18 +241,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* NEWSLETTER */}
+      {/* COMUNIDAD */}
       <section style={{ padding: "0 24px 80px" }}>
         <div className="container" style={{ background: "var(--brand-soft)", borderRadius: 28, padding: "64px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: -40, right: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(181, 102, 61, 0.2)" }} />
           <div style={{ position: "absolute", bottom: -60, left: -40, width: 240, height: 240, borderRadius: "50%", background: "rgba(156, 168, 136, 0.25)" }} />
           <div style={{ position: "relative", maxWidth: 540, margin: "0 auto" }}>
-            <div className="eyebrow" style={{ color: "var(--brand-deep)", marginBottom: 12 }}>· Newsletter ·</div>
-            <h2 className="h2" style={{ marginBottom: 16 }}>Llevate 10% off en tu primera compra 🎁</h2>
-            <p className="soft" style={{ marginBottom: 28 }}>Suscribite y enterate primero de novedades, drops y descuentos exclusivos.</p>
-            <div style={{ display: "flex", gap: 8, maxWidth: 460, margin: "0 auto" }}>
-              <input className="input" placeholder="tu@email.com" style={{ flex: 1, background: "rgba(255,255,255,0.8)" }} />
-              <button className="btn btn-dark">Sumarme</button>
+            <div className="eyebrow" style={{ color: "var(--brand-deep)", marginBottom: 12 }}>· Sumate ·</div>
+            <h2 className="h2" style={{ marginBottom: 16 }}>Enterate primero de los drops</h2>
+            <p className="soft" style={{ marginBottom: 28 }}>Seguinos en Instagram y WhatsApp para ver lo nuevo apenas lo subimos a la web.</p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <a href="https://instagram.com/unilubikids" target="_blank" rel="noopener noreferrer" className="btn btn-dark"><Icon name="instagram" size={16} /> Instagram</a>
+              <a href="https://wa.me/5491151982734" target="_blank" rel="noopener noreferrer" className="btn btn-ghost"><Icon name="whatsapp" size={16} /> WhatsApp</a>
             </div>
           </div>
         </div>

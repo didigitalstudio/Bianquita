@@ -104,7 +104,7 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("[POST /api/orders]", err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "No pudimos crear el pedido" },
+      { error: "No pudimos crear el pedido. Intentá de nuevo o escribinos por WhatsApp." },
       { status: 500 },
     );
   }
