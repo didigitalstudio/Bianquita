@@ -17,7 +17,7 @@ const FONTS = {
 };
 
 const App = () => {
-  const [route, setRoute] = useState({ name: "admin", adminView: "dashboard" });
+  const [route, setRoute] = useState({ name: "home" });
   const [products, setProducts] = useState(window.INITIAL_PRODUCTS);
   const [orders, setOrders] = useState(window.INITIAL_ORDERS);
   const [cart, setCart] = useState([]);

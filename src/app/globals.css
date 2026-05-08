@@ -1,0 +1,137 @@
+/* Unilubi Kids — sistema visual */
+:root {
+  --brand: #B5663D;
+  --brand-deep: #8E4C28;
+  --brand-soft: #E9D4C2;
+  --salvia: #9CA888;
+  --salvia-deep: #6F7E5E;
+  --cream: #F5EFE6;
+  --cream-2: #EDE5D7;
+  --paper: #FBF8F2;
+  --ink: #2B231D;
+  --ink-soft: #5B5249;
+  --ink-mute: #8C8278;
+  --line: #E2D8C9;
+  --line-soft: #EFE7D8;
+  --rose: #D9B3A2;
+  --beige: #D6C5AE;
+  --shadow: 0 1px 2px rgba(60, 40, 20, 0.04), 0 8px 24px rgba(60, 40, 20, 0.06);
+  --shadow-lg: 0 4px 12px rgba(60, 40, 20, 0.06), 0 24px 48px rgba(60, 40, 20, 0.10);
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+  --font-sans: 'Nunito', 'Quicksand', system-ui, sans-serif;
+  --font-display: 'Fraunces', 'Nunito', serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* === Tipografía === */
+.h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(40px, 6vw, 84px); line-height: 1.02; letter-spacing: -0.02em; }
+.h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.08; letter-spacing: -0.01em; }
+.h3 { font-family: var(--font-display); font-weight: 400; font-size: 24px; line-height: 1.2; }
+.eyebrow { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; color: var(--brand); }
+.muted { color: var(--ink-mute); }
+.soft { color: var(--ink-soft); }
+
+/* === Botones === */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; border-radius: var(--radius-pill); font-weight: 600; font-size: 14px; transition: transform .15s, background .15s, color .15s, border-color .15s; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: var(--brand-deep); }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-ghost:hover { border-color: var(--brand); color: var(--brand); }
+.btn-dark { background: var(--ink); color: var(--paper); }
+.btn-dark:hover { background: #000; }
+.btn-link { padding: 0; background: transparent; color: var(--brand); font-weight: 600; }
+.btn-link:hover { color: var(--brand-deep); }
+.btn-icon { width: 40px; height: 40px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+.btn-lg { padding: 16px 28px; font-size: 15px; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
+
+/* === Inputs === */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12px; font-weight: 600; color: var(--ink-soft); letter-spacing: 0.02em; }
+.input, .select, .textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color .15s, box-shadow .15s;
+}
+.input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(181, 102, 61, 0.12); }
+.textarea { resize: vertical; min-height: 90px; }
+
+/* === Layout helpers === */
+.container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+.container-wide { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
+.row { display: flex; align-items: center; gap: 12px; }
+.col { display: flex; flex-direction: column; }
+.between { justify-content: space-between; }
+.center { justify-content: center; }
+
+/* === Card === */
+.card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.card-soft { background: var(--cream); border-radius: var(--radius-lg); }
+
+/* === Badge === */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.badge-brand { background: var(--brand); color: #fff; }
+.badge-soft { background: var(--brand-soft); color: var(--brand-deep); }
+.badge-salvia { background: var(--salvia); color: #fff; }
+.badge-cream { background: var(--cream); color: var(--ink-soft); border: 1px solid var(--line); }
+.badge-warn { background: #f4d4b4; color: #8a4a14; }
+.badge-ok { background: #d4e4cc; color: #3a5a26; }
+.badge-err { background: #f0c8c8; color: #8a3030; }
+
+/* === Producto card === */
+.product-card { background: var(--cream); border-radius: var(--radius-lg); overflow: hidden; transition: transform .25s; cursor: pointer; display: block; }
+.product-card:hover { transform: translateY(-3px); }
+.product-card .img-wrap { aspect-ratio: 4/5; overflow: hidden; position: relative; background: var(--cream-2); }
+.product-card .img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.product-card:hover .img-wrap img { transform: scale(1.04); }
+.product-card .body { padding: 14px 16px 18px; }
+
+/* === Decoración === */
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); display: inline-block; }
+.divider { height: 1px; background: var(--line); }
+
+/* === Scrollbars === */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--brand-soft); }
+
+/* === Animaciones === */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn .35s ease-out both; }
+
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.slide-up { animation: slideUp .4s ease-out both; }
+
+/* === Toast === */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 12px 20px; border-radius: var(--radius-pill); font-size: 14px; box-shadow: var(--shadow-lg); z-index: 1000; animation: slideUp .3s ease-out; white-space: nowrap; }
+
+/* === Decorative dots === */
+.dotsx { display: flex; align-items: center; gap: 6px; color: var(--brand); }
+.dotsx::before, .dotsx::after { content: ""; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
