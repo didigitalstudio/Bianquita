@@ -5,6 +5,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import ShellWrapper from "@/components/layout/ShellWrapper";
 import { BRAND } from "@/lib/constants";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND.url),
@@ -28,7 +29,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+async function getIsAdmin(): Promise<boolean> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .maybeSingle();
+    return !!profile?.is_admin;
+  } catch {
+    return false;
+  }
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const isAdminUser = await getIsAdmin();
   return (
     <html lang="es">
       <head>
@@ -40,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartProvider>
           <WishlistProvider>
             <ToastProvider>
-              <ShellWrapper>{children}</ShellWrapper>
+              <ShellWrapper isAdminUser={isAdminUser}>{children}</ShellWrapper>
             </ToastProvider>
           </WishlistProvider>
         </CartProvider>

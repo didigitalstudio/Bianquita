@@ -10,7 +10,7 @@ import CartDrawer from "@/components/shop/CartDrawer";
 import SideMenu from "./SideMenu";
 import SearchOverlay from "@/components/shop/SearchOverlay";
 
-export default function Navbar() {
+export default function Navbar({ isAdminUser = false }: { isAdminUser?: boolean }) {
   const { cart, cartOpen, openCart, closeCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -54,7 +54,7 @@ export default function Navbar() {
       </header>
 
       <CartDrawer open={cartOpen} onClose={closeCart} />
-      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} isAdminUser={isAdminUser} />
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );

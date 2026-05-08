@@ -31,10 +31,7 @@ export default function Footer() {
             ["Mi cuenta", "/cuenta"],
           ]} />
           <FooterCol title="Empresa" items={[
-            ["Sobre nosotros", "/"],
             ["Mayorista", "/contacto"],
-            ["Términos", "/"],
-            ["Privacidad", "/"],
           ]} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.08)", fontSize: 12, color: "rgba(245, 239, 230, 0.5)" }}>
