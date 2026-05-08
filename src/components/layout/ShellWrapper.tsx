@@ -4,15 +4,20 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import Toast from "@/components/ui/Toast";
 
-export default function ShellWrapper({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin");
+interface Props {
+  children: React.ReactNode;
+  isAdminUser?: boolean;
+}
 
-  if (isAdmin) return <>{children}</>;
+export default function ShellWrapper({ children, isAdminUser = false }: Props) {
+  const pathname = usePathname();
+  const isAdminRoute = pathname.startsWith("/admin");
+
+  if (isAdminRoute) return <>{children}</>;
 
   return (
     <>
-      <Navbar />
+      <Navbar isAdminUser={isAdminUser} />
       <main>{children}</main>
       <Footer />
       <Toast />

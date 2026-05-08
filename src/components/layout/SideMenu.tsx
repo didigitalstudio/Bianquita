@@ -7,6 +7,7 @@ import Logo from "@/components/ui/Logo";
 interface SideMenuProps {
   open: boolean;
   onClose: () => void;
+  isAdminUser?: boolean;
 }
 
 const mainLinks = [
@@ -18,14 +19,17 @@ const mainLinks = [
   { l: "Ofertas", href: "/tienda?tag=oferta" },
 ];
 
-const secondaryLinks = [
+const baseSecondaryLinks = [
   { l: "Mi cuenta", href: "/cuenta" },
   { l: "Envíos", href: "/envios" },
   { l: "Preguntas frecuentes", href: "/faq" },
   { l: "Contacto", href: "/contacto" },
 ];
 
-export default function SideMenu({ open, onClose }: SideMenuProps) {
+export default function SideMenu({ open, onClose, isAdminUser = false }: SideMenuProps) {
+  const secondaryLinks = isAdminUser
+    ? [...baseSecondaryLinks, { l: "Admin", href: "/admin" }]
+    : baseSecondaryLinks;
   if (!open) return null;
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43, 35, 29, 0.4)", zIndex: 100, animation: "fadeIn .2s" }}>
