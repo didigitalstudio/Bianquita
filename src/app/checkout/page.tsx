@@ -39,7 +39,7 @@ export default function CheckoutPage() {
           </div>
           <h1 className="h2" style={{ marginBottom: 12 }}>¡Gracias por tu compra!</h1>
           <p className="muted" style={{ marginBottom: 8 }}>Pedido <strong style={{ color: "var(--brand)" }}>{orderId}</strong></p>
-          <p className="soft" style={{ marginBottom: 32 }}>Te enviamos un mail de confirmación. Vamos a preparar tu paquete con cariño.</p>
+          <p className="soft" style={{ marginBottom: 32 }}>Te enviamos un mail de confirmación. Tu pedido se despacha en las próximas 48 hs hábiles.</p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
             <Link href="/cuenta" className="btn btn-primary">Ver mis pedidos</Link>
             <Link href="/" className="btn btn-ghost">Volver al inicio</Link>

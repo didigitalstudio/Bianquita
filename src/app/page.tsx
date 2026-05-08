@@ -24,12 +24,12 @@ export default function HomePage() {
               </span>
             </div>
             <h1 className="h1" style={{ marginBottom: 24 }}>
-              Mimos<br />
-              <span style={{ fontStyle: "italic", color: "var(--brand)" }}>en cada</span> puntada,<br />
-              ternura en cada talle.
+              Diseño para<br />
+              <span style={{ fontStyle: "italic", color: "var(--brand)" }}>chicos que</span><br />
+              ya tienen onda.
             </h1>
             <p style={{ fontSize: 18, color: "var(--ink-soft)", maxWidth: 480, marginBottom: 36, lineHeight: 1.6 }}>
-              Ropita rica, suavecita y con onda para tus chiquitos. Seleccionamos las mejores marcas para que vistan suavecitos y a la moda. 🤍
+              Indumentaria infantil de diseño argentino. Materiales cuidados, cortes que duran y una colección que cambia cada temporada.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Link href="/tienda" className="btn btn-primary btn-lg">
@@ -134,7 +134,7 @@ export default function HomePage() {
               { title: "Mundial 26", emoji: "⚽", desc: "Para que alienten desde la cuna", img: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600&q=80", href: "/tienda?tag=best-seller" },
               { title: "Outlet", emoji: "💸", desc: "Hasta 40% off en talles seleccionados", img: "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=600&q=80", href: "/tienda?tag=oferta" },
               { title: "Para regalar", emoji: "🎁", desc: "Sets envueltos, listos para sorprender", img: "https://images.unsplash.com/photo-1544487102-26142b0e4f63?w=600&q=80", href: "/tienda?tag=regalo" },
-              { title: "Pijama party", emoji: "☾", desc: "Modal suavecito para dormir rico", img: "https://images.unsplash.com/photo-1519278409-1f56fdda7fe5?w=600&q=80", href: "/tienda?audience=nino" },
+              { title: "Pijama party", emoji: "☾", desc: "Modal premium para una buena noche", img: "https://images.unsplash.com/photo-1519278409-1f56fdda7fe5?w=600&q=80", href: "/tienda?audience=nino" },
             ].map((c, i) => (
               <Link key={i} href={c.href} style={{ borderRadius: 22, overflow: "hidden", position: "relative", textAlign: "left", display: "block", minHeight: 220 }}>
                 <Image src={c.img} alt={c.title} fill style={{ objectFit: "cover" }} sizes="30vw" />

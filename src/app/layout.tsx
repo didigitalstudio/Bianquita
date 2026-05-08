@@ -6,7 +6,7 @@ import ShellWrapper from "@/components/layout/ShellWrapper";
 
 export const metadata: Metadata = {
   title: "Unilubi Kids — Indumentaria infantil",
-  description: "Ropita rica, suavecita y con onda para tus chiquitos. Envíos a todo el país.",
+  description: "Indumentaria infantil de diseño argentino. Colecciones de temporada con envíos a todo el país.",
   icons: { icon: "/logo.png" },
 };
 

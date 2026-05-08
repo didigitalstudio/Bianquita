@@ -10,7 +10,7 @@ export default function Footer() {
           <div>
             <Logo inverted />
             <p style={{ marginTop: 20, color: "rgba(245, 239, 230, 0.65)", fontSize: 14, lineHeight: 1.6, maxWidth: 320 }}>
-              Indumentaria infantil pensada con ternura y materiales nobles. Diseñamos para que las infancias sean libres, suaves y memorables.
+              Indumentaria infantil de diseño argentino. Materiales de calidad, colecciones de temporada y envíos a todo el país.
             </p>
             <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
               <a href="https://instagram.com/unilubikids" target="_blank" rel="noopener noreferrer" className="btn-icon" style={{ background: "rgba(255,255,255,0.06)", display: "inline-flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, borderRadius: "50%" }}><Icon name="instagram" size={18} /></a>
