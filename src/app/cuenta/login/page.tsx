@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Logo from "@/components/ui/Logo";
 import { createClient } from "@/lib/supabase/client";
+import { translateAuthError } from "@/lib/auth-errors";
 
 export default function CuentaLoginPage() {
   return (
@@ -12,17 +13,6 @@ export default function CuentaLoginPage() {
       <LoginForm />
     </Suspense>
   );
-}
-
-const SUPABASE_AUTH_ERRORS: Record<string, string> = {
-  "Invalid login credentials": "Email o contraseña incorrectos.",
-  "Email not confirmed": "Tenés que confirmar tu email antes de ingresar.",
-  "Email rate limit exceeded": "Demasiados intentos. Probá en unos minutos.",
-  "User not found": "No existe una cuenta con ese email.",
-};
-
-function translateAuthError(message: string): string {
-  return SUPABASE_AUTH_ERRORS[message] ?? "No pudimos iniciar sesión. Probá de nuevo.";
 }
 
 function LoginForm() {
@@ -69,7 +59,10 @@ function LoginForm() {
           {error && <p style={{ fontSize: 13, color: "#a55", margin: 0 }}>{error}</p>}
           <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "Ingresando…" : "Ingresar"}</button>
         </form>
-        <div style={{ marginTop: 20, textAlign: "center", fontSize: 13 }}>
+        <div style={{ marginTop: 16, textAlign: "center", fontSize: 13 }}>
+          <Link href="/cuenta/olvide-password" className="btn-link">¿Olvidaste tu contraseña?</Link>
+        </div>
+        <div style={{ marginTop: 12, textAlign: "center", fontSize: 13 }}>
           ¿Todavía no tenés cuenta? <Link href="/cuenta/registro" className="btn-link">Registrate</Link>
         </div>
       </div>
