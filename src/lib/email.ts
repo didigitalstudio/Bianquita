@@ -11,6 +11,15 @@ type OrderStatus = Database["public"]["Enums"]["order_status"];
 const FROM_NAME = BRAND.name;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "Unilubi Kids <hola@unilubikids.com.ar>";
 
+/**
+ * Inbox where the admin reads. Used as `replyTo` on emails sent to customers
+ * (so when they hit Reply, it lands somewhere we actually read) and as `to`
+ * for contact-form notifications.
+ */
+function getAdminInbox(): string {
+  return process.env.CONTACT_INBOX ?? "unilubikids@gmail.com";
+}
+
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY;
   if (!key) return null;
@@ -95,6 +104,7 @@ export async function sendOrderConfirmationEmail(order: OrderRow): Promise<void>
   await resend.emails.send({
     from: FROM_EMAIL,
     to: order.customer_email,
+    replyTo: getAdminInbox(),
     subject: `${FROM_NAME} — Pedido ${order.order_number} confirmado`,
     html: htmlShell("Recibimos tu pedido", content),
   });
@@ -109,7 +119,6 @@ interface ContactMessage {
 
 export async function sendContactMessageEmail(msg: ContactMessage): Promise<void> {
   const resend = getResend();
-  const inbox = process.env.CONTACT_INBOX ?? "unilubikids@gmail.com";
   if (!resend) return;
   const escapeHtml = (s: string) =>
     s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -123,7 +132,7 @@ export async function sendContactMessageEmail(msg: ContactMessage): Promise<void
   `;
   await resend.emails.send({
     from: FROM_EMAIL,
-    to: inbox,
+    to: getAdminInbox(),
     replyTo: msg.email,
     subject: `[Contacto] ${msg.subject} — ${msg.name}`,
     html: htmlShell("Nuevo mensaje desde la web", content),
@@ -144,6 +153,7 @@ export async function sendOrderStatusEmail(order: OrderRow): Promise<void> {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: order.customer_email,
+    replyTo: getAdminInbox(),
     subject: `${FROM_NAME} — ${copy.subject}`,
     html: htmlShell(copy.heading, content),
   });
