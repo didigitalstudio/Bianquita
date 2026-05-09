@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/ui/Icon";
 import ProductCard from "@/components/shop/ProductCard";
+import SizeGuideModal from "@/components/shop/SizeGuideModal";
 import { fmt } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/context/ToastContext";
@@ -36,6 +37,7 @@ export default function ProductDetail({ product, audiences, related, ratingAvera
   const [color, setColor] = useState(product.colors[0]);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("desc");
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const inStock = (product.stock[size] ?? 0) > 0;
 
   const onAdd = () => {
@@ -113,7 +115,7 @@ export default function ProductDetail({ product, audiences, related, ratingAvera
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
                 <span style={{ fontSize: 13, fontWeight: 600 }}>Talle: <span style={{ color: "var(--ink-soft)", fontWeight: 400 }}>{size}</span></span>
-                <button className="btn-link" style={{ fontSize: 12 }}>Guía de talles</button>
+                <button type="button" onClick={() => setSizeGuideOpen(true)} className="btn-link" style={{ fontSize: 12 }}>Guía de talles</button>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {sizes.map((s) => {
@@ -137,9 +139,15 @@ export default function ProductDetail({ product, audiences, related, ratingAvera
               </button>
               <button onClick={onWishlist} className="btn btn-ghost btn-lg" aria-label={inWishlist ? "Quitar de favoritos" : "Agregar a favoritos"} style={{ width: 52, height: 52, color: inWishlist ? "var(--brand)" : "inherit" }}><Icon name="heart" /></button>
             </div>
-            <Link href="/checkout" className="btn btn-dark btn-lg" onClick={onAdd} style={{ width: "100%", marginBottom: 28, display: "flex", justifyContent: "center" }}>
-              Comprar ahora →
-            </Link>
+            {inStock ? (
+              <Link href="/checkout" className="btn btn-dark btn-lg" onClick={onAdd} style={{ width: "100%", marginBottom: 28, display: "flex", justifyContent: "center" }}>
+                Comprar ahora →
+              </Link>
+            ) : (
+              <button className="btn btn-dark btn-lg" disabled style={{ width: "100%", marginBottom: 28, opacity: 0.5, cursor: "not-allowed" }}>
+                Sin stock en este talle
+              </button>
+            )}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div className="card-soft" style={{ padding: 14, display: "flex", gap: 10, alignItems: "center" }}>
@@ -178,6 +186,8 @@ export default function ProductDetail({ product, audiences, related, ratingAvera
           </div>
         </div>
       </section>
+
+      <SizeGuideModal open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} audience={product.audience} />
     </div>
   );
 }

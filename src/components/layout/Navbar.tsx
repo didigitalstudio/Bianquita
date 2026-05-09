@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Icon from "@/components/ui/Icon";
 import Logo from "@/components/ui/Logo";
@@ -15,9 +15,13 @@ export default function Navbar({ isAdminUser = false }: { isAdminUser?: boolean 
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
 
-  const navActive = (href: string) => pathname.startsWith(href);
+  const audience = pathname.startsWith("/tienda") ? searchParams.get("audience") : null;
+  const tag = pathname.startsWith("/tienda") ? searchParams.get("tag") : null;
+  const isAudienceActive = (a: string) => audience === a;
+  const isTagActive = (t: string) => tag === t;
 
   return (
     <>
@@ -31,10 +35,10 @@ export default function Navbar({ isAdminUser = false }: { isAdminUser?: boolean 
               <Icon name="menu" size={22} />
             </button>
             <nav style={{ display: "flex", gap: 22, fontSize: 14, fontWeight: 500 }}>
-              <Link href="/tienda?audience=recien-nacido" style={{ color: navActive("/tienda") && pathname.includes("recien-nacido") ? "var(--brand)" : "inherit" }}>Recién nacido</Link>
-              <Link href="/tienda?audience=bebe" style={{ color: navActive("/tienda") && pathname.includes("bebe") ? "var(--brand)" : "inherit" }}>Bebé</Link>
-              <Link href="/tienda?audience=nino" style={{ color: navActive("/tienda") && pathname.includes("nino") ? "var(--brand)" : "inherit" }}>Niño/a</Link>
-              <Link href="/tienda?tag=oferta" style={{ color: "var(--brand)" }}>Ofertas</Link>
+              <Link href="/tienda?audience=recien-nacido" style={{ color: isAudienceActive("recien-nacido") ? "var(--brand)" : "inherit" }}>Recién nacido</Link>
+              <Link href="/tienda?audience=bebe" style={{ color: isAudienceActive("bebe") ? "var(--brand)" : "inherit" }}>Bebé</Link>
+              <Link href="/tienda?audience=nino" style={{ color: isAudienceActive("nino") ? "var(--brand)" : "inherit" }}>Niño/a</Link>
+              <Link href="/tienda?tag=oferta" style={{ color: isTagActive("oferta") ? "var(--brand-deep)" : "var(--brand)", fontWeight: isTagActive("oferta") ? 700 : 500 }}>Ofertas</Link>
             </nav>
           </div>
           <Link href="/" style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>

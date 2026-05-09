@@ -58,9 +58,9 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
                     <div style={{ fontSize: 12, color: "var(--ink-mute)", marginBottom: 8, textTransform: "capitalize" }}>{item.color.replace("-", " ")} · Talle {item.size}</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--line)", borderRadius: 999 }}>
-                        <button onClick={() => updateQty(idx, item.qty - 1)} style={{ padding: "4px 8px" }}><Icon name="minus" size={12} /></button>
+                        <button onClick={() => updateQty(idx, Math.max(1, item.qty - 1))} disabled={item.qty <= 1} aria-label="Disminuir cantidad" style={{ padding: "4px 8px", opacity: item.qty <= 1 ? 0.3 : 1, cursor: item.qty <= 1 ? "not-allowed" : "pointer" }}><Icon name="minus" size={12} /></button>
                         <span style={{ fontSize: 13, minWidth: 22, textAlign: "center" }}>{item.qty}</span>
-                        <button onClick={() => updateQty(idx, item.qty + 1)} style={{ padding: "4px 8px" }}><Icon name="plus" size={12} /></button>
+                        <button onClick={() => updateQty(idx, item.qty + 1)} aria-label="Aumentar cantidad" style={{ padding: "4px 8px" }}><Icon name="plus" size={12} /></button>
                       </div>
                       <button onClick={() => removeFromCart(idx)} style={{ color: "var(--ink-mute)", padding: 4 }}><Icon name="trash" size={14} /></button>
                     </div>
