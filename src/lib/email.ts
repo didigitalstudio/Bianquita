@@ -26,6 +26,23 @@ function getResend(): Resend | null {
   return new Resend(key);
 }
 
+/**
+ * Wrapper around `resend.emails.send()` that throws on Resend's error
+ * envelope (`{ data: null, error: {...} }`). The SDK does NOT throw on
+ * API errors — it returns them in the response. Without this guard, a
+ * domain-not-verified / rate-limit / auth error would silently swallow
+ * the email and the caller would think it sent.
+ */
+async function sendOrThrow(
+  resend: Resend,
+  payload: Parameters<Resend["emails"]["send"]>[0],
+): Promise<void> {
+  const { error } = await resend.emails.send(payload);
+  if (error) {
+    throw new Error(`[resend] ${error.name}: ${error.message}`);
+  }
+}
+
 const STATUS_COPY: Record<OrderStatus, { subject: string; heading: string; body: string }> = {
   "pendiente-pago": {
     subject: "Tu pedido está pendiente de pago",
@@ -101,7 +118,7 @@ export async function sendOrderConfirmationEmail(order: OrderRow): Promise<void>
       Te vamos a avisar cuando empecemos a preparar tu pedido y cuando salga hacia tu domicilio.
     </p>
   `;
-  await resend.emails.send({
+  await sendOrThrow(resend, {
     from: FROM_EMAIL,
     to: order.customer_email,
     replyTo: getAdminInbox(),
@@ -130,7 +147,7 @@ export async function sendContactMessageEmail(msg: ContactMessage): Promise<void
     <p style="font-size:14px;color:#6B5E50;margin:0 0 4px;">Mensaje</p>
     <p style="font-size:15px;line-height:1.6;white-space:pre-wrap;margin:0;">${escapeHtml(msg.message)}</p>
   `;
-  await resend.emails.send({
+  await sendOrThrow(resend, {
     from: FROM_EMAIL,
     to: getAdminInbox(),
     replyTo: msg.email,
@@ -150,7 +167,7 @@ export async function sendOrderStatusEmail(order: OrderRow): Promise<void> {
     <p style="font-size:15px;color:#4A4138;">${copy.body}</p>
     ${orderTable(order)}
   `;
-  await resend.emails.send({
+  await sendOrThrow(resend, {
     from: FROM_EMAIL,
     to: order.customer_email,
     replyTo: getAdminInbox(),

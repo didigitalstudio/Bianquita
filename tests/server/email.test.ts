@@ -213,4 +213,26 @@ describe("sendContactMessageEmail", () => {
     const { sendContactMessageEmail } = await import("@/lib/email");
     await expect(sendContactMessageEmail(baseMsg)).rejects.toThrow("Resend API down");
   });
+
+  it("THROWS when Resend returns the error envelope (not just on network failure)", async () => {
+    // Real-world scenario: Resend returns 200 with `{ data: null, error: {...} }`
+    // when the domain isn't verified, the API key is invalid, rate limit hit, etc.
+    // Without sendOrThrow() the call would silently succeed and the email would
+    // never be delivered — the user would see "ok:true" with no email arriving.
+    sendMock.mockResolvedValueOnce({
+      data: null,
+      error: { name: "validation_error", message: "The unilubikids.com.ar domain is not verified" },
+    });
+    const { sendContactMessageEmail } = await import("@/lib/email");
+    await expect(sendContactMessageEmail(baseMsg)).rejects.toThrow(/domain is not verified/);
+  });
+
+  it("THROWS for order emails too when Resend returns error envelope", async () => {
+    sendMock.mockResolvedValueOnce({
+      data: null,
+      error: { name: "rate_limit_exceeded", message: "Too many requests" },
+    });
+    const { sendOrderConfirmationEmail } = await import("@/lib/email");
+    await expect(sendOrderConfirmationEmail(sampleOrder)).rejects.toThrow(/Too many requests/);
+  });
 });
