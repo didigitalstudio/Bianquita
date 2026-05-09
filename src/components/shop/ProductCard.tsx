@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Icon from "@/components/ui/Icon";
@@ -23,7 +23,20 @@ export default function ProductCard({ product, bg }: ProductCardProps) {
   const router = useRouter();
   const [hovering, setHovering] = useState(false);
   const [showSizes, setShowSizes] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
   const inWishlist = isInWishlist(product.id);
+
+  // On touch devices `:hover` never fires — show the quick-buy button by default.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mql = window.matchMedia("(hover: none)");
+    const update = () => setIsTouch(mql.matches);
+    update();
+    mql.addEventListener("change", update);
+    return () => mql.removeEventListener("change", update);
+  }, []);
+
+  const showQuickBuy = hovering || isTouch;
 
   const onToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -70,7 +83,7 @@ export default function ProductCard({ product, bg }: ProductCardProps) {
           <Icon name="heart" size={16} />
         </button>
 
-        {hovering && sizes.length > 0 && (
+        {showQuickBuy && sizes.length > 0 && (
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: 10, background: "linear-gradient(180deg, transparent, rgba(0,0,0,0.05))", animation: "fadeIn .2s" }}>
             {!showSizes ? (
               <button

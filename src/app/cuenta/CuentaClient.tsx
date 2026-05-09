@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import EmptyState from "@/components/ui/EmptyState";
@@ -140,6 +140,10 @@ function AddressesPanel({ addresses }: { addresses: Address[] }) {
   const [pending, startTransition] = useTransition();
   const [form, setForm] = useState({ label: "", address: "", city: "", zip: "" });
   const [error, setError] = useState<string | null>(null);
+  const labelId = useId();
+  const addressId = useId();
+  const cityId = useId();
+  const zipId = useId();
 
   const onAdd = () => {
     if (!form.label || !form.address || !form.city || !form.zip) { setError("Completá todos los campos"); return; }
@@ -149,8 +153,8 @@ function AddressesPanel({ addresses }: { addresses: Address[] }) {
         await addMyAddress({ label: form.label, address: form.address, city: form.city, zip: form.zip });
         setForm({ label: "", address: "", city: "", zip: "" });
         setAdding(false);
-      } catch (e) {
-        setError((e as Error).message);
+      } catch {
+        setError("No pudimos guardar la dirección. Intentá de nuevo.");
       }
     });
   };
@@ -180,10 +184,10 @@ function AddressesPanel({ addresses }: { addresses: Address[] }) {
       {adding ? (
         <div className="card" style={{ padding: 22 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <div className="field"><label>Etiqueta</label><input className="input" placeholder="Casa / Trabajo" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} /></div>
-            <div className="field"><label>Dirección</label><input className="input" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
-            <div className="field"><label>Ciudad</label><input className="input" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
-            <div className="field"><label>CP</label><input className="input" inputMode="numeric" value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} /></div>
+            <div className="field"><label htmlFor={labelId}>Etiqueta</label><input id={labelId} className="input" placeholder="Casa / Trabajo" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} /></div>
+            <div className="field"><label htmlFor={addressId}>Dirección</label><input id={addressId} className="input" autoComplete="street-address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+            <div className="field"><label htmlFor={cityId}>Ciudad</label><input id={cityId} className="input" autoComplete="address-level2" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
+            <div className="field"><label htmlFor={zipId}>CP</label><input id={zipId} className="input" inputMode="numeric" autoComplete="postal-code" value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} /></div>
           </div>
           {error && <p style={{ color: "#a55", fontSize: 13, margin: "8px 0 0" }}>{error}</p>}
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
@@ -202,6 +206,10 @@ function ProfilePanel({ email, profile }: { email: string; profile: { name: stri
   const [form, setForm] = useState({ name: profile.name, phone: profile.phone, dni: profile.dni });
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
+  const emailId = useId();
+  const nameId = useId();
+  const phoneId = useId();
+  const dniId = useId();
 
   const onSave = () => {
     setMsg(null);
@@ -209,8 +217,8 @@ function ProfilePanel({ email, profile }: { email: string; profile: { name: stri
       try {
         await updateMyProfile(form);
         setMsg("✓ Datos actualizados");
-      } catch (e) {
-        setMsg((e as Error).message);
+      } catch {
+        setMsg("No pudimos guardar los cambios. Probá de nuevo.");
       }
     });
   };
@@ -219,11 +227,11 @@ function ProfilePanel({ email, profile }: { email: string; profile: { name: stri
     <>
       <h1 className="h2" style={{ marginBottom: 24 }}>Mis datos</h1>
       <div className="card cuenta-profile-card" style={{ padding: 28, maxWidth: 640 }}>
-        <div className="field"><label>Email</label><input className="input" value={email} disabled /></div>
-        <div className="field" style={{ marginTop: 14 }}><label>Nombre completo</label><input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+        <div className="field"><label htmlFor={emailId}>Email</label><input id={emailId} className="input" value={email} disabled /></div>
+        <div className="field" style={{ marginTop: 14 }}><label htmlFor={nameId}>Nombre completo</label><input id={nameId} className="input" autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 14 }}>
-          <div className="field"><label>Teléfono</label><input className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
-          <div className="field"><label>DNI</label><input className="input" inputMode="numeric" value={form.dni} onChange={(e) => setForm({ ...form, dni: e.target.value })} /></div>
+          <div className="field"><label htmlFor={phoneId}>Teléfono</label><input id={phoneId} className="input" type="tel" autoComplete="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+          <div className="field"><label htmlFor={dniId}>DNI</label><input id={dniId} className="input" inputMode="numeric" value={form.dni} onChange={(e) => setForm({ ...form, dni: e.target.value })} /></div>
         </div>
         <div style={{ marginTop: 18, display: "flex", gap: 12, alignItems: "center" }}>
           <button className="btn btn-primary" onClick={onSave} disabled={pending}>{pending ? "Guardando…" : "Guardar cambios"}</button>

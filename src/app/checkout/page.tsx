@@ -43,6 +43,7 @@ export default function CheckoutPage() {
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [bankInfo, setBankInfo] = useState<BankInfo | null>(null);
+  const [bankInfoError, setBankInfoError] = useState(false);
   const [customer, setCustomer] = useState<CustomerForm>({ firstName: "", lastName: "", email: "", dni: "", phone: "" });
   const [shipForm, setShipForm] = useState<ShippingForm>({ address: "", city: "", zip: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -55,7 +56,11 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (payment !== "transfer" || bankInfo) return;
-    fetch("/api/payment/bank-info").then((r) => r.json()).then(setBankInfo).catch(() => null);
+    setBankInfoError(false);
+    fetch("/api/payment/bank-info")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("bank-info"))))
+      .then(setBankInfo)
+      .catch(() => setBankInfoError(true));
   }, [payment, bankInfo]);
 
   const validateCustomer = (): boolean => {
@@ -256,6 +261,10 @@ export default function CheckoutPage() {
                   {bankInfo ? (
                     <p style={{ margin: 0, color: "var(--ink-soft)" }}>
                       {bankInfo.bank}{bankInfo.cbu ? ` · CBU ${bankInfo.cbu}` : ""}{bankInfo.alias ? ` · Alias ${bankInfo.alias}` : ""}{bankInfo.holder ? ` · Titular: ${bankInfo.holder}` : ""}
+                    </p>
+                  ) : bankInfoError ? (
+                    <p style={{ margin: 0, color: "#a55" }}>
+                      No pudimos cargar los datos. Te los enviamos por email cuando confirmes el pedido.
                     </p>
                   ) : (
                     <p style={{ margin: 0, color: "var(--ink-mute)" }}>Cargando datos bancarios…</p>

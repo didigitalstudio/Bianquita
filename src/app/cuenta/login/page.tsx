@@ -14,6 +14,17 @@ export default function CuentaLoginPage() {
   );
 }
 
+const SUPABASE_AUTH_ERRORS: Record<string, string> = {
+  "Invalid login credentials": "Email o contraseña incorrectos.",
+  "Email not confirmed": "Tenés que confirmar tu email antes de ingresar.",
+  "Email rate limit exceeded": "Demasiados intentos. Probá en unos minutos.",
+  "User not found": "No existe una cuenta con ese email.",
+};
+
+function translateAuthError(message: string): string {
+  return SUPABASE_AUTH_ERRORS[message] ?? "No pudimos iniciar sesión. Probá de nuevo.";
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,7 +41,7 @@ function LoginForm() {
     const supabase = createClient();
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) {
-      setError(authError.message);
+      setError(translateAuthError(authError.message));
       setLoading(false);
       return;
     }
