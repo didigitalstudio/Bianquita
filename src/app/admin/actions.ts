@@ -53,6 +53,7 @@ export async function createProduct(input: Product) {
     colors: input.colors,
     stock: input.stock as Database["public"]["Tables"]["products"]["Insert"]["stock"],
     img: input.img,
+    images: (input.images ?? []).filter((u) => u.trim().length > 0),
   });
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
@@ -79,6 +80,7 @@ export async function updateProduct(id: string, input: Product) {
       colors: input.colors,
       stock: input.stock as Database["public"]["Tables"]["products"]["Update"]["stock"],
       img: input.img,
+      images: (input.images ?? []).filter((u) => u.trim().length > 0),
     })
     .eq("id", id);
   if (error) throw new Error(error.message);

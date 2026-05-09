@@ -323,7 +323,7 @@ function AdminProducts({ products, categories, audiences, onRemove, onEdit, onNe
 function AdminEditProduct({ products, categories, audiences, productId, onSaved, onCancel, showToast }: { products: Product[]; categories: Category[]; audiences: Audience[]; productId: string | null; onSaved: (saved: Product, isNew: boolean) => void; onCancel: () => void; showToast: (m: string) => void }) {
   const isNew = !productId || productId === "new";
   const existing = products.find((p) => p.id === productId);
-  const blank: Product = { id: "", name: "", category: categories[0]?.id ?? "bodies", audience: audiences[0]?.id ?? "bebe", price: 0, compareAt: null, stock: {}, colors: [], description: "", materials: "", care: "", tags: [], img: "" };
+  const blank: Product = { id: "", name: "", category: categories[0]?.id ?? "bodies", audience: audiences[0]?.id ?? "bebe", price: 0, compareAt: null, stock: {}, colors: [], description: "", materials: "", care: "", tags: [], img: "", images: [] };
   const [form, setForm] = useState<Product>(existing ? JSON.parse(JSON.stringify(existing)) : blank);
   const [pending, startTransition] = useTransition();
 
@@ -410,11 +410,59 @@ function AdminEditProduct({ products, categories, audiences, productId, onSaved,
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div className="card" style={{ padding: 24 }}>
-            <div className="h3" style={{ marginBottom: 18 }}>Imagen del producto</div>
+            <div className="h3" style={{ marginBottom: 18 }}>Imagen principal</div>
             <div style={{ aspectRatio: "1/1", borderRadius: 14, overflow: "hidden", background: "var(--cream)", marginBottom: 12, position: "relative" }}>
               <ProductImage src={form.img} alt="" label="vista" />
             </div>
             <div className="field"><label>URL de imagen</label><input className="input" value={form.img} onChange={(e) => upd("img", e.target.value)} placeholder="https://…" /></div>
+          </div>
+          <div className="card" style={{ padding: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <div className="h3">Imágenes adicionales</div>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => upd("images", [...(form.images ?? []), ""])}
+              >
+                <Icon name="plus" size={14} /> Agregar
+              </button>
+            </div>
+            <p className="muted" style={{ fontSize: 12, marginTop: 0, marginBottom: 14 }}>
+              URLs de fotos extra para la galería del producto. Se muestran como thumbnails clickeables.
+            </p>
+            {(form.images ?? []).length === 0 ? (
+              <div className="muted" style={{ fontSize: 13, padding: "12px 0" }}>
+                Sin imágenes adicionales. Solo se va a mostrar la principal.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {(form.images ?? []).map((url, i) => (
+                  <div key={i} style={{ display: "grid", gridTemplateColumns: "48px 1fr auto", gap: 8, alignItems: "center" }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 8, overflow: "hidden", background: "var(--cream)", position: "relative", flexShrink: 0 }}>
+                      <ProductImage src={url} alt="" label={`${i + 1}`} />
+                    </div>
+                    <input
+                      className="input"
+                      value={url}
+                      onChange={(e) => {
+                        const next = [...(form.images ?? [])];
+                        next[i] = e.target.value;
+                        upd("images", next);
+                      }}
+                      placeholder="https://…"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => upd("images", (form.images ?? []).filter((_, idx) => idx !== i))}
+                      aria-label={`Quitar imagen ${i + 1}`}
+                      style={{ color: "var(--ink-mute)", padding: 8 }}
+                    >
+                      <Icon name="x" size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="card" style={{ padding: 24 }}>
             <div className="h3" style={{ marginBottom: 14 }}>Colores disponibles</div>
