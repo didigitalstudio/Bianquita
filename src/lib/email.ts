@@ -109,7 +109,7 @@ interface ContactMessage {
 
 export async function sendContactMessageEmail(msg: ContactMessage): Promise<void> {
   const resend = getResend();
-  const inbox = process.env.CONTACT_INBOX ?? "hola@unilubikids.com.ar";
+  const inbox = process.env.CONTACT_INBOX ?? "unilubikids@gmail.com";
   if (!resend) return;
   const escapeHtml = (s: string) =>
     s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");

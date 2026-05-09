@@ -126,7 +126,7 @@ describe("sendContactMessageEmail", () => {
     expect(sendMock).toHaveBeenCalledTimes(1);
     const payload = sendMock.mock.calls[0][0];
     expect(payload.from).toBe("Unilubi Kids <hola@unilubikids.com.ar>");
-    expect(payload.to).toBe("hola@unilubikids.com.ar"); // default inbox
+    expect(payload.to).toBe("unilubikids@gmail.com"); // default inbox
     expect(payload.replyTo).toBe("lucia@cliente.dev");
     expect(payload.subject).toBe("[Contacto] Consulta general — Lucia Pérez");
     expect(payload.html).toContain("Lucia Pérez");
