@@ -60,6 +60,7 @@ describe("email senders — orders", () => {
     const payload = sendMock.mock.calls[0][0];
     expect(payload.to).toBe("lucia@test.dev");
     expect(payload.from).toBe("Unilubi Kids <hola@unilubikids.com.ar>");
+    expect(payload.replyTo).toBe("unilubikids@gmail.com"); // customer replies land in admin inbox
     expect(payload.subject).toContain("ULB-9001");
     expect(payload.html).toContain("ULB-9001");
     expect(payload.html).toContain("Body manga larga rayado");
@@ -83,11 +84,21 @@ describe("email senders — orders", () => {
         expect(sendMock).toHaveBeenCalledTimes(1);
         const payload = sendMock.mock.calls[0][0];
         expect(payload.to).toBe("lucia@test.dev");
+        expect(payload.replyTo).toBe("unilubikids@gmail.com");
         expect(payload.subject).toMatch(subjectMatch);
         expect(payload.html).toMatch(bodyMatch);
         expect(payload.html).toContain("ULB-9001");
       });
     }
+  });
+
+  it("CONTACT_INBOX env var also overrides reply-to in order emails", async () => {
+    process.env.CONTACT_INBOX = "soporte@unilubikids.com.ar";
+    vi.resetModules();
+    const { sendOrderConfirmationEmail } = await import("@/lib/email");
+    await sendOrderConfirmationEmail(sampleOrder);
+    const payload = sendMock.mock.calls[0][0];
+    expect(payload.replyTo).toBe("soporte@unilubikids.com.ar");
   });
 
   it("is a no-op when RESEND_API_KEY is missing (dev mode)", async () => {
