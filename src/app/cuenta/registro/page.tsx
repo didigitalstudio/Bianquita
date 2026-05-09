@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/ui/Logo";
 import { createClient } from "@/lib/supabase/client";
+import { translateAuthError } from "@/lib/auth-errors";
 
 export default function CuentaRegistroPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function CuentaRegistroPage() {
       options: { data: { name } },
     });
     if (authError) {
-      setError(authError.message);
+      setError(translateAuthError(authError.message));
       setLoading(false);
       return;
     }
