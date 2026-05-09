@@ -47,6 +47,35 @@ export default function CheckoutPage() {
   const [customer, setCustomer] = useState<CustomerForm>({ firstName: "", lastName: "", email: "", dni: "", phone: "" });
   const [shipForm, setShipForm] = useState<ShippingForm>({ address: "", city: "", zip: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [autofilled, setAutofilled] = useState(false);
+
+  // Autofill from /api/me when the customer is logged in. Only overwrites
+  // fields the user hasn't started typing in (don't blow away their input).
+  useEffect(() => {
+    if (autofilled) return;
+    fetch("/api/me")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { user: null | { email: string; name: string; phone: string; dni: string; defaultAddress: { address: string; city: string; zip: string } | null } } | null) => {
+        if (!data?.user) return;
+        const [first, ...rest] = (data.user.name || "").trim().split(/\s+/);
+        setCustomer((c) => ({
+          firstName: c.firstName || first || "",
+          lastName: c.lastName || rest.join(" ") || "",
+          email: c.email || data.user!.email || "",
+          phone: c.phone || data.user!.phone || "",
+          dni: c.dni || data.user!.dni || "",
+        }));
+        if (data.user.defaultAddress) {
+          setShipForm((s) => ({
+            address: s.address || data.user!.defaultAddress!.address || "",
+            city: s.city || data.user!.defaultAddress!.city || "",
+            zip: s.zip || data.user!.defaultAddress!.zip || "",
+          }));
+        }
+      })
+      .catch(() => null)
+      .finally(() => setAutofilled(true));
+  }, [autofilled]);
 
   const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const shippingOpt = SHIPPING_OPTIONS.find((o) => o.id === shipping)!;
@@ -87,6 +116,7 @@ export default function CheckoutPage() {
   const submitOrder = async () => {
     setSubmitting(true);
     setErrors({});
+    let leavingPage = false;
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -114,11 +144,11 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) {
         showToast(data.error || "No pudimos crear el pedido");
-        setSubmitting(false);
         return;
       }
       clearCart();
       if (data.paymentRedirectUrl) {
+        leavingPage = true;
         window.location.href = data.paymentRedirectUrl as string;
         return;
       }
@@ -127,7 +157,11 @@ export default function CheckoutPage() {
       showToast("¡Pedido confirmado!");
     } catch {
       showToast("Error de conexión. Probá de nuevo.");
-      setSubmitting(false);
+    } finally {
+      // Re-enable the button unless we're navigating away to MercadoPago
+      // (in that case the button shouldn't flash back to "Confirmar pedido"
+      // while the redirect is in flight).
+      if (!leavingPage) setSubmitting(false);
     }
   };
 

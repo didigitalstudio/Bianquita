@@ -40,6 +40,12 @@ export default function ProductDetail({ product, audiences, related, ratingAvera
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const inStock = (product.stock[size] ?? 0) > 0;
 
+  // Gallery: main image + extras from product.images. Dedupe in case the
+  // main image is also in the array. If there's only one image total, hide
+  // the thumbnail row entirely instead of showing a single dead thumb.
+  const gallery = [product.img, ...(product.images ?? []).filter((u) => u !== product.img)];
+  const [activeImage, setActiveImage] = useState(0);
+
   const onAdd = () => {
     addToCart({ ...product, size, color, qty });
     showToast(`${product.name} agregado al carrito`);
@@ -69,15 +75,24 @@ export default function ProductDetail({ product, audiences, related, ratingAvera
         <div className="container-wide producto-grid">
           <div>
             <div style={{ aspectRatio: "4/5", background: "var(--cream)", borderRadius: 22, overflow: "hidden", marginBottom: 12, position: "relative" }}>
-              <Image src={product.img} alt={product.name} fill style={{ objectFit: "cover" }} sizes="50vw" priority />
+              <Image src={gallery[activeImage]} alt={product.name} fill style={{ objectFit: "cover" }} sizes="50vw" priority />
             </div>
-            <div className="producto-thumbs">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} style={{ aspectRatio: "1/1", background: i === 0 ? "var(--brand-soft)" : "var(--cream)", borderRadius: 14, overflow: "hidden", border: i === 0 ? "2px solid var(--brand)" : "1px solid var(--line)", cursor: "pointer", position: "relative" }}>
-                  <Image src={product.img} alt="" fill style={{ objectFit: "cover" }} sizes="12vw" />
-                </div>
-              ))}
-            </div>
+            {gallery.length > 1 && (
+              <div className="producto-thumbs">
+                {gallery.map((src, i) => (
+                  <button
+                    key={src + i}
+                    type="button"
+                    onClick={() => setActiveImage(i)}
+                    aria-label={`Ver foto ${i + 1} de ${gallery.length}`}
+                    aria-current={i === activeImage}
+                    style={{ aspectRatio: "1/1", background: "var(--cream)", borderRadius: 14, overflow: "hidden", border: i === activeImage ? "2px solid var(--brand)" : "1px solid var(--line)", cursor: "pointer", position: "relative", padding: 0 }}
+                  >
+                    <Image src={src} alt="" fill style={{ objectFit: "cover" }} sizes="12vw" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div>

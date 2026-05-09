@@ -53,7 +53,7 @@ export default function CuentaRegistroPage() {
           <p className="muted" style={{ fontSize: 14, marginBottom: 24 }}>
             Confirmá tu dirección desde el link que te llegó a <strong>{email}</strong> para activar tu cuenta.
           </p>
-          <Link href="/cuenta/login" className="btn btn-primary">Ir a iniciar sesión</Link>
+          <Link href={`/cuenta/login?email=${encodeURIComponent(email)}`} className="btn btn-primary">Ir a iniciar sesión</Link>
         </div>
       </div>
     );
