@@ -54,7 +54,7 @@ export default function AdminClient({ initialProducts, initialOrders, categories
   };
 
   return (
-    <div className="admin-shell" style={{ background: "#FAF6EE" }}>
+    <div className="admin-shell" style={{ background: "#FDF4EC" }}>
       <aside style={{ background: "var(--ink)", color: "var(--paper)", padding: "24px 16px", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "8px 12px 24px", borderBottom: "1px solid rgba(255,255,255,0.08)", marginBottom: 20 }}>
           <Logo size="sm" inverted />
@@ -184,7 +184,7 @@ function AdminDashboard({ products, orders, setView }: { products: Product[]; or
           { label: "Ventas del mes", value: fmt(totalSales), trend: orders.length === 0 ? "Aún sin ventas" : `${orders.length} pedidos`, icon: "trend", color: "var(--brand)" },
           { label: "Pedidos activos", value: pending, trend: `${pending} por preparar`, icon: "box", color: "var(--salvia-deep)" },
           { label: "Productos activos", value: products.length, trend: `${lowStock} con stock bajo`, icon: "tag", color: "var(--ink)" },
-          { label: "Sin stock", value: outStock, trend: outStock > 0 ? "Requiere atención" : "Todo bien", icon: "shield", color: outStock > 0 ? "#a55" : "var(--salvia-deep)" },
+          { label: "Sin stock", value: outStock, trend: outStock > 0 ? "Requiere atención" : "Todo bien", icon: "shield", color: outStock > 0 ? "#C97B85" : "var(--salvia-deep)" },
         ].map((k) => (
           <div key={k.label} className="card" style={{ padding: 22 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
@@ -304,11 +304,11 @@ function AdminProducts({ products, categories, audiences, onRemove, onEdit, onNe
               <div><div style={{ fontWeight: 600 }}>{p.name}</div><div style={{ fontSize: 12, color: "var(--ink-mute)" }}>{p.id} · {audiences.find((a) => a.id === p.audience)?.label}</div></div>
               <div style={{ textTransform: "capitalize" }}>{p.category}</div>
               <div><div style={{ fontWeight: 700 }}>{fmt(p.price)}</div>{p.compareAt && <div style={{ fontSize: 11, color: "var(--ink-mute)", textDecoration: "line-through" }}>{fmt(p.compareAt)}</div>}</div>
-              <div><div style={{ fontWeight: 600, color: out ? "#a55" : low ? "#b87" : "var(--ink)" }}>{stock} u.</div><div style={{ fontSize: 11, color: "var(--ink-mute)" }}>{Object.keys(p.stock).length} talles</div></div>
+              <div><div style={{ fontWeight: 600, color: out ? "#C97B85" : low ? "#D4A574" : "var(--ink)" }}>{stock} u.</div><div style={{ fontSize: 11, color: "var(--ink-mute)" }}>{Object.keys(p.stock).length} talles</div></div>
               <div><span className={`badge ${out ? "badge-err" : low ? "badge-warn" : "badge-ok"}`}>{out ? "Sin stock" : low ? "Stock bajo" : "Activo"}</span></div>
               <div style={{ display: "flex", gap: 4, justifyContent: "flex-end" }}>
                 <button className="btn-icon" style={{ width: 32, height: 32 }} onClick={() => onEdit(p.id)} aria-label="Editar producto"><Icon name="edit" size={14} /></button>
-                <button className="btn-icon" style={{ width: 32, height: 32, color: "#a55" }} onClick={() => onRemove(p.id)} aria-label="Eliminar producto"><Icon name="trash" size={14} /></button>
+                <button className="btn-icon" style={{ width: 32, height: 32, color: "#C97B85" }} onClick={() => onRemove(p.id)} aria-label="Eliminar producto"><Icon name="trash" size={14} /></button>
               </div>
             </div>
           );
@@ -353,7 +353,7 @@ function AdminEditProduct({ products, categories, audiences, productId, onSaved,
   };
 
   const ALL_COLORS = ["crema", "salvia", "terracota", "rosa-viejo", "beige", "celeste-suave"];
-  const COLOR_HEX: Record<string, string> = { crema: "#F5EFE6", salvia: "#9CA888", terracota: "#B5663D", "rosa-viejo": "#D9B3A2", beige: "#D6C5AE", "celeste-suave": "#C5D4DA" };
+  const COLOR_HEX: Record<string, string> = { crema: "#FDF4EC", salvia: "#B8D4B8", terracota: "#C9A38A", "rosa-viejo": "#E8B4BC", beige: "#E8D4B8", "celeste-suave": "#C8DCE2" };
 
   return (
     <div className="fade-in">
@@ -399,7 +399,7 @@ function AdminEditProduct({ products, categories, audiences, productId, onSaved,
                 <div key={s} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 6, padding: 12, border: "1px solid var(--line)", borderRadius: 12, background: "#fff" }}>
                   <div>
                     <div style={{ fontSize: 11, color: "var(--ink-mute)", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: 4 }}>Talle {s}</div>
-                    <input type="number" value={v} onChange={(e) => updStock(s, e.target.value)} style={{ width: "100%", border: "none", fontSize: 18, fontWeight: 700, color: v === 0 ? "#a55" : "var(--ink)", padding: 0 }} />
+                    <input type="number" value={v} onChange={(e) => updStock(s, e.target.value)} style={{ width: "100%", border: "none", fontSize: 18, fontWeight: 700, color: v === 0 ? "#C97B85" : "var(--ink)", padding: 0 }} />
                   </div>
                   <button onClick={() => removeSize(s)} aria-label={`Eliminar talle ${s}`} style={{ color: "var(--ink-mute)", padding: 4, alignSelf: "flex-start" }}><Icon name="x" size={14} /></button>
                 </div>
@@ -535,14 +535,14 @@ function AdminStock({ products, onUpdate }: { products: Product[]; onUpdate: (pi
               <div style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", gap: 16, alignItems: "center", marginBottom: 14 }}>
                 <div style={{ width: 56, height: 64, borderRadius: 8, overflow: "hidden", background: "var(--cream)", position: "relative" }}><ProductImage src={p.img} alt={p.name} label="img" /></div>
                 <div><div style={{ fontWeight: 600 }}>{p.name}</div><div style={{ fontSize: 12, color: "var(--ink-mute)" }}>{p.id} · {fmt(p.price)}</div></div>
-                <div style={{ textAlign: "right" }}><div style={{ fontFamily: "var(--font-display)", fontSize: 22, color: total === 0 ? "#a55" : total < 5 ? "#b87" : "var(--ink)" }}>{total}</div><div style={{ fontSize: 11, color: "var(--ink-mute)", letterSpacing: "0.04em", textTransform: "uppercase" }}>Total</div></div>
+                <div style={{ textAlign: "right" }}><div style={{ fontFamily: "var(--font-display)", fontSize: 22, color: total === 0 ? "#C97B85" : total < 5 ? "#D4A574" : "var(--ink)" }}>{total}</div><div style={{ fontSize: 11, color: "var(--ink-mute)", letterSpacing: "0.04em", textTransform: "uppercase" }}>Total</div></div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
                 {Object.entries(p.stock).map(([s, v]) => (
                   <div key={s} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 10px", background: v === 0 ? "rgba(170,80,80,0.08)" : "var(--cream)", borderRadius: 10 }}>
                     <div style={{ flex: 1, fontSize: 12 }}><div style={{ color: "var(--ink-mute)", letterSpacing: "0.04em", textTransform: "uppercase", fontWeight: 600, fontSize: 10 }}>Talle {s}</div></div>
                     <button onClick={() => adjustStock(p.id, s, -1)} aria-label="Disminuir" style={{ width: 26, height: 26, borderRadius: 6, background: "#fff", border: "1px solid var(--line)" }}><Icon name="minus" size={12} /></button>
-                    <input type="number" value={v} onChange={(e) => setStockValue(p.id, s, e.target.value)} style={{ width: 36, textAlign: "center", border: "none", background: "transparent", fontWeight: 700, fontSize: 14, color: v === 0 ? "#a55" : "var(--ink)" }} />
+                    <input type="number" value={v} onChange={(e) => setStockValue(p.id, s, e.target.value)} style={{ width: 36, textAlign: "center", border: "none", background: "transparent", fontWeight: 700, fontSize: 14, color: v === 0 ? "#C97B85" : "var(--ink)" }} />
                     <button onClick={() => adjustStock(p.id, s, 1)} aria-label="Aumentar" style={{ width: 26, height: 26, borderRadius: 6, background: "#fff", border: "1px solid var(--line)" }}><Icon name="plus" size={12} /></button>
                   </div>
                 ))}

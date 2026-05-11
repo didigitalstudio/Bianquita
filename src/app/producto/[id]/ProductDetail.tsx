@@ -14,8 +14,8 @@ import { useWishlist } from "@/context/WishlistContext";
 import type { Product, Audience } from "@/lib/types";
 
 const COLOR_HEX: Record<string, string> = {
-  crema: "#F5EFE6", salvia: "#9CA888", terracota: "#B5663D",
-  "rosa-viejo": "#D9B3A2", beige: "#D6C5AE", "celeste-suave": "#C5D4DA", "crema-mix": "#E9D4C2",
+  crema: "#FDF4EC", salvia: "#B8D4B8", terracota: "#C9A38A",
+  "rosa-viejo": "#E8B4BC", beige: "#E8D4B8", "celeste-suave": "#C8DCE2", "crema-mix": "#FAE0E4",
 };
 
 interface Props {

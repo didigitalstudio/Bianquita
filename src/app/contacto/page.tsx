@@ -108,7 +108,7 @@ export default function ContactoPage() {
                   required
                   maxLength={120}
                 />
-                {errors.name && <div style={{ color: "#a55", fontSize: 12, marginTop: 4 }}>{errors.name}</div>}
+                {errors.name && <div style={{ color: "#C97B85", fontSize: 12, marginTop: 4 }}>{errors.name}</div>}
               </div>
               <div className="field">
                 <label htmlFor={emailId}>Email</label>
@@ -123,7 +123,7 @@ export default function ContactoPage() {
                   required
                   maxLength={200}
                 />
-                {errors.email && <div style={{ color: "#a55", fontSize: 12, marginTop: 4 }}>{errors.email}</div>}
+                {errors.email && <div style={{ color: "#C97B85", fontSize: 12, marginTop: 4 }}>{errors.email}</div>}
               </div>
               <div className="field" style={{ gridColumn: "span 2" }}>
                 <label htmlFor={subjectId}>Asunto</label>
@@ -150,7 +150,7 @@ export default function ContactoPage() {
                   required
                   maxLength={4000}
                 />
-                {errors.message && <div style={{ color: "#a55", fontSize: 12, marginTop: 4 }}>{errors.message}</div>}
+                {errors.message && <div style={{ color: "#C97B85", fontSize: 12, marginTop: 4 }}>{errors.message}</div>}
               </div>
             </div>
             <button className="btn btn-primary" type="submit" disabled={submitting} style={{ marginTop: 20, width: "100%" }}>

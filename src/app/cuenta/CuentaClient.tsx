@@ -189,7 +189,7 @@ function AddressesPanel({ addresses }: { addresses: Address[] }) {
             <div className="field"><label htmlFor={cityId}>Ciudad</label><input id={cityId} className="input" autoComplete="address-level2" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></div>
             <div className="field"><label htmlFor={zipId}>CP</label><input id={zipId} className="input" inputMode="numeric" autoComplete="postal-code" value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} /></div>
           </div>
-          {error && <p style={{ color: "#a55", fontSize: 13, margin: "8px 0 0" }}>{error}</p>}
+          {error && <p style={{ color: "#C97B85", fontSize: 13, margin: "8px 0 0" }}>{error}</p>}
           <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
             <button className="btn btn-ghost" onClick={() => setAdding(false)} disabled={pending}>Cancelar</button>
             <button className="btn btn-primary" onClick={onAdd} disabled={pending}>{pending ? "Guardando…" : "Guardar"}</button>
@@ -235,7 +235,7 @@ function ProfilePanel({ email, profile }: { email: string; profile: { name: stri
         </div>
         <div style={{ marginTop: 18, display: "flex", gap: 12, alignItems: "center" }}>
           <button className="btn btn-primary" onClick={onSave} disabled={pending}>{pending ? "Guardando…" : "Guardar cambios"}</button>
-          {msg && <span style={{ fontSize: 13, color: msg.startsWith("✓") ? "var(--salvia-deep)" : "#a55" }}>{msg}</span>}
+          {msg && <span style={{ fontSize: 13, color: msg.startsWith("✓") ? "var(--salvia-deep)" : "#C97B85" }}>{msg}</span>}
         </div>
       </div>
     </>

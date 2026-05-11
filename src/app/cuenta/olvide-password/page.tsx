@@ -73,7 +73,7 @@ export default function OlvidePasswordPage() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          {error && <p style={{ fontSize: 13, color: "#a55", margin: 0 }}>{error}</p>}
+          {error && <p style={{ fontSize: 13, color: "#C97B85", margin: 0 }}>{error}</p>}
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Enviando…" : "Enviar link de recuperación"}
           </button>

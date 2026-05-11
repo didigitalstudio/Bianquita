@@ -8,7 +8,7 @@ export default async function PagoErrorPage({ searchParams }: { searchParams: Pr
   return (
     <div className="container" style={{ padding: "80px 24px", maxWidth: 640 }}>
       <div style={{ textAlign: "center", padding: "48px 32px", background: "var(--cream)", borderRadius: 22 }}>
-        <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(170,80,80,0.12)", color: "#a55", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+        <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(201,123,133,0.15)", color: "#C97B85", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
           <Icon name="x" size={36} />
         </div>
         <h1 className="h2" style={{ marginBottom: 12 }}>El pago fue rechazado</h1>

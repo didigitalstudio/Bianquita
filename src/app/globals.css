@@ -1,22 +1,22 @@
-/* Unilubi Kids — sistema visual */
+/* Unilubi Kids — sistema visual (paleta pastel: rosa, marrón, verde) */
 :root {
-  --brand: #B5663D;
-  --brand-deep: #8E4C28;
-  --brand-soft: #E9D4C2;
-  --salvia: #9CA888;
-  --salvia-deep: #6F7E5E;
-  --cream: #F5EFE6;
-  --cream-2: #EDE5D7;
-  --paper: #FBF8F2;
-  --ink: #2B231D;
-  --ink-soft: #5B5249;
-  --ink-mute: #8C8278;
-  --line: #E2D8C9;
-  --line-soft: #EFE7D8;
-  --rose: #D9B3A2;
-  --beige: #D6C5AE;
-  --shadow: 0 1px 2px rgba(60, 40, 20, 0.04), 0 8px 24px rgba(60, 40, 20, 0.06);
-  --shadow-lg: 0 4px 12px rgba(60, 40, 20, 0.06), 0 24px 48px rgba(60, 40, 20, 0.10);
+  --brand: #E8B4BC;
+  --brand-deep: #C98A95;
+  --brand-soft: #FAE0E4;
+  --salvia: #B8D4B8;
+  --salvia-deep: #94B894;
+  --cream: #FDF4EC;
+  --cream-2: #F8E8D8;
+  --paper: #FFF9F5;
+  --ink: #5C4A3F;
+  --ink-soft: #8A7568;
+  --ink-mute: #B0998A;
+  --line: #F0DFD4;
+  --line-soft: #F8ECE0;
+  --rose: #F5C2C7;
+  --beige: #E8D4B8;
+  --shadow: 0 1px 2px rgba(150, 110, 100, 0.05), 0 8px 24px rgba(150, 110, 100, 0.07);
+  --shadow-lg: 0 4px 12px rgba(150, 110, 100, 0.07), 0 24px 48px rgba(150, 110, 100, 0.10);
   --radius: 14px;
   --radius-lg: 22px;
   --radius-pill: 999px;
@@ -79,7 +79,7 @@ img { display: block; max-width: 100%; }
   color: var(--ink);
   transition: border-color .15s, box-shadow .15s;
 }
-.input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(181, 102, 61, 0.12); }
+.input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(232, 180, 188, 0.30); }
 .textarea { resize: vertical; min-height: 90px; }
 
 /* === Layout helpers === */
@@ -100,9 +100,9 @@ img { display: block; max-width: 100%; }
 .badge-soft { background: var(--brand-soft); color: var(--brand-deep); }
 .badge-salvia { background: var(--salvia); color: #fff; }
 .badge-cream { background: var(--cream); color: var(--ink-soft); border: 1px solid var(--line); }
-.badge-warn { background: #f4d4b4; color: #8a4a14; }
-.badge-ok { background: #d4e4cc; color: #3a5a26; }
-.badge-err { background: #f0c8c8; color: #8a3030; }
+.badge-warn { background: #F8E0C8; color: #A56A2C; }
+.badge-ok { background: #D4E8D4; color: #4F7A4F; }
+.badge-err { background: #F8D4D8; color: #A85A66; }
 
 /* === Producto card === */
 .product-card { background: var(--cream); border-radius: var(--radius-lg); overflow: hidden; transition: transform .25s; cursor: pointer; display: block; }

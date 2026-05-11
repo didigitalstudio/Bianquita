@@ -297,7 +297,7 @@ export default function CheckoutPage() {
                       {bankInfo.bank}{bankInfo.cbu ? ` · CBU ${bankInfo.cbu}` : ""}{bankInfo.alias ? ` · Alias ${bankInfo.alias}` : ""}{bankInfo.holder ? ` · Titular: ${bankInfo.holder}` : ""}
                     </p>
                   ) : bankInfoError ? (
-                    <p style={{ margin: 0, color: "#a55" }}>
+                    <p style={{ margin: 0, color: "#C97B85" }}>
                       No pudimos cargar los datos. Te los enviamos por email cuando confirmes el pedido.
                     </p>
                   ) : (
@@ -354,7 +354,7 @@ function Field({ label, children, error, span = 1 }: { label: string; children: 
     <div className="field" style={{ gridColumn: span === 2 ? "span 2" : undefined }}>
       <label htmlFor={id}>{label}</label>
       {child}
-      {error && <div style={{ color: "#a55", fontSize: 12, marginTop: 4 }}>{error}</div>}
+      {error && <div style={{ color: "#C97B85", fontSize: 12, marginTop: 4 }}>{error}</div>}
     </div>
   );
 }

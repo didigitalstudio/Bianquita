@@ -81,7 +81,7 @@ export default function CuentaRegistroPage() {
             <input id="password" type="password" className="input" required minLength={8} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} />
             <div style={{ fontSize: 12, color: "var(--ink-mute)", marginTop: 4 }}>Mínimo 8 caracteres.</div>
           </div>
-          {error && <p style={{ fontSize: 13, color: "#a55", margin: 0 }}>{error}</p>}
+          {error && <p style={{ fontSize: 13, color: "#C97B85", margin: 0 }}>{error}</p>}
           <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "Creando cuenta…" : "Crear cuenta"}</button>
         </form>
         <div style={{ marginTop: 20, textAlign: "center", fontSize: 13 }}>

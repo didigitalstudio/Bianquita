@@ -56,7 +56,7 @@ function LoginForm() {
             <label htmlFor="password">Contraseña</label>
             <input id="password" type="password" className="input" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-          {error && <p style={{ fontSize: 13, color: "#a55", margin: 0 }}>{error}</p>}
+          {error && <p style={{ fontSize: 13, color: "#C97B85", margin: 0 }}>{error}</p>}
           <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "Ingresando…" : "Ingresar"}</button>
         </form>
         <div style={{ marginTop: 16, textAlign: "center", fontSize: 13 }}>

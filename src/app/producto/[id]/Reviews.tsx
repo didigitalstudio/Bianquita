@@ -91,7 +91,7 @@ export default function Reviews({ productId, summary, isLoggedIn }: { productId:
               <label htmlFor="r-text">Tu reseña</label>
               <textarea id="r-text" className="textarea" maxLength={2000} value={text} onChange={(e) => setText(e.target.value)} rows={4} />
             </div>
-            {error && <p style={{ color: "#a55", fontSize: 13, margin: "0 0 12px" }}>{error}</p>}
+            {error && <p style={{ color: "#C97B85", fontSize: 13, margin: "0 0 12px" }}>{error}</p>}
             <button className="btn btn-primary" disabled={pending}>{pending ? "Guardando…" : "Publicar reseña"}</button>
           </form>
         )}

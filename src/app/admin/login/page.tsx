@@ -77,7 +77,7 @@ function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          {error && <p style={{ fontSize: 13, color: "#a55", margin: 0 }}>{error}</p>}
+          {error && <p style={{ fontSize: 13, color: "#C97B85", margin: 0 }}>{error}</p>}
           <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: 4 }}>
             {loading ? "Ingresando…" : "Ingresar"}
           </button>

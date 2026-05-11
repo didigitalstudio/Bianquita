@@ -91,7 +91,7 @@ function ResetForm() {
         </p>
 
         {hasSession === false && (
-          <div className="card-soft" style={{ padding: 14, marginBottom: 16, fontSize: 13, color: "#a55" }}>
+          <div className="card-soft" style={{ padding: 14, marginBottom: 16, fontSize: 13, color: "#C97B85" }}>
             El link expiró o ya fue usado.{" "}
             <Link href="/cuenta/olvide-password" className="btn-link">Pedí uno nuevo</Link>.
           </div>
@@ -127,7 +127,7 @@ function ResetForm() {
               disabled={hasSession === false}
             />
           </div>
-          {error && <p style={{ fontSize: 13, color: "#a55", margin: 0 }}>{error}</p>}
+          {error && <p style={{ fontSize: 13, color: "#C97B85", margin: 0 }}>{error}</p>}
           <button
             type="submit"
             className="btn btn-primary"
